@@ -10,6 +10,8 @@
     "dev:api": "dotnet run --project .\\apps\\backend\\CasinoDesk.Api --urls http://localhost:5067",
     "build": "npm --workspace apps/frontend run build",
     "build:api": "dotnet build .\\apps\\backend\\CasinoDesk.Api -c Debug",
-    "preview": "npm --workspace apps/frontend run preview"
+    "preview": "npm --workspace apps/frontend run preview",
+    "test": "npm --workspace apps/frontend run test",
+    "test:coverage": "npm --workspace apps/frontend run test:coverage"
   }
 }
