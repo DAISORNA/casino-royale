@@ -41,6 +41,7 @@ jobs:
             /o:"daisorna-1" \
             /d:sonar.host.url="https://sonarcloud.io" \
             /d:sonar.token="${SONAR_TOKEN}" \
+            /d:sonar.projectBaseDir="." \
             /d:sonar.javascript.lcov.reportPaths="apps/frontend/coverage/lcov.info" \
             /d:sonar.exclusions="**/node_modules/**,**/dist/**,**/coverage/**,**/bin/**,**/obj/**"
 
