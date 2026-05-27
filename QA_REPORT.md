@@ -13,8 +13,8 @@
 | Organization Key | `daisorna-1` |
 | Project Key | `DAISORNA_casino-royale` |
 | Rama analizada | `main` |
-| Commit analizado | `fd80a092` |
-| Fecha del reporte | 2026-05-26 |
+| Commit analizado | `bba019d` |
+| Fecha del reporte | 2026-05-27 |
 | Dashboard SonarCloud | https://sonarcloud.io/summary/overall?id=DAISORNA_casino-royale&branch=main |
 
 ## 2. Objetivo
@@ -39,58 +39,66 @@ No incluye:
 - Pruebas funcionales manuales completas.
 - Pruebas de carga o performance.
 - Pruebas de penetracion.
-- Validacion completa de cobertura de tests, debido a que la cobertura no esta configurada en SonarCloud.
+- Validacion funcional completa de la cobertura, debido a que actualmente solo existe una base inicial de pruebas automatizadas frontend.
 
 ## 4. Resumen Ejecutivo
 
-El proyecto fue importado y analizado correctamente en SonarQube Cloud. El analisis detecta issues abiertos en seguridad, confiabilidad y mantenibilidad.
+El proyecto fue importado y analizado correctamente en SonarQube Cloud. Posteriormente se configuro un pipeline de GitHub Actions para ejecutar pruebas frontend, generar coverage y enviar el analisis a SonarCloud.
 
-La mantenibilidad obtiene una calificacion general favorable, pero existen riesgos relevantes en seguridad y confiabilidad que deben ser revisados por el equipo de desarrollo.
+El estado actual del Quality Gate es `Failed`. El proyecto presenta riesgos relevantes en seguridad, confiabilidad y coverage. La mantenibilidad conserva una calificacion general favorable, pero existen hallazgos que deben ser revisados por el equipo de desarrollo.
 
-Adicionalmente, la cobertura de pruebas no se encuentra configurada, por lo que actualmente no existe evidencia automatizada desde SonarCloud sobre el porcentaje de codigo cubierto por tests.
+La cobertura ya se encuentra activa en SonarCloud, pero el porcentaje inicial es bajo: `2.2%` de coverage general. Esto confirma que la medicion funciona, pero tambien evidencia que el proyecto requiere ampliar pruebas automatizadas.
 
 ## 5. Resultados Generales
 
 | Metrica | Resultado |
 | --- | --- |
-| Quality Gate | No computado en el primer analisis; se actualizara en el siguiente analisis |
-| Security | C - 4 issues abiertos |
+| Quality Gate | Failed - 1 condicion fallida |
+| Open Issues | 139 issues abiertos |
+| Security | C - 5 issues abiertos |
+| Security Hotspots | E - 6 hotspots por revisar |
 | Reliability | C - 74 issues abiertos |
-| Maintainability | A - 72 issues abiertos |
+| Maintainability | A - 70 issues abiertos |
 | Accepted Issues | 0 |
-| Coverage | No configurada |
+| Coverage | 2.2% |
+| Line Coverage | 1.5% |
+| Branch Coverage | 3.9% |
+| Lines to Cover | 1081 |
+| Uncovered Lines | 1065 |
 | Duplications | 1.3% |
 | Lines of Code | 7.2k |
-| Ultimo analisis | Hace aproximadamente 1 minuto al momento de la revision |
+| Ultimo analisis | Ejecutado por GitHub Actions en el commit `bba019d` |
 
-Nota: SonarCloud indica que algunas condiciones de duplicacion y cobertura fueron ignoradas para evitar falsos fallos en cambios pequenos, debido a que el codigo nuevo contiene menos de 20 lineas.
+Nota: la cobertura ya se visualiza en SonarCloud despues de configurar el pipeline `SonarCloud` en GitHub Actions. El porcentaje es bajo porque el proyecto no contaba previamente con una suite amplia de pruebas automatizadas.
 
 ## 6. Hallazgos Principales
 
 | ID | Categoria | Severidad QA | Hallazgo | Impacto Potencial | Recomendacion |
 | --- | --- | --- | --- | --- | --- |
-| QA-001 | Security | Alta | SonarCloud reporta 4 issues abiertos de seguridad. | Posible exposicion a vulnerabilidades o uso inseguro de datos/configuracion. | Revisar cada issue de seguridad en SonarCloud y priorizar su correccion antes de despliegues productivos. |
+| QA-001 | Security | Alta | SonarCloud reporta 5 issues abiertos de seguridad. | Posible exposicion a vulnerabilidades o uso inseguro de datos/configuracion. | Revisar cada issue de seguridad en SonarCloud y priorizar su correccion antes de despliegues productivos. |
 | QA-002 | Reliability | Alta | SonarCloud reporta 74 issues abiertos de confiabilidad. | Riesgo de errores en ejecucion, excepciones no controladas o comportamiento inconsistente. | Clasificar los issues por severidad y corregir primero los bugs criticos o bloqueantes. |
-| QA-003 | Maintainability | Media | Existen 72 issues abiertos de mantenibilidad, aunque la calificacion general es A. | Incremento de deuda tecnica y mayor costo de mantenimiento futuro. | Atender code smells recurrentes, complejidad innecesaria y oportunidades de simplificacion. |
-| QA-004 | Coverage | Alta | La cobertura de pruebas no esta configurada en SonarCloud. | No hay evidencia automatizada de cobertura del codigo analizado. | Configurar pruebas automatizadas y reportes de cobertura para frontend y backend. |
+| QA-003 | Maintainability | Media | Existen 70 issues abiertos de mantenibilidad, aunque la calificacion general es A. | Incremento de deuda tecnica y mayor costo de mantenimiento futuro. | Atender code smells recurrentes, complejidad innecesaria y oportunidades de simplificacion. |
+| QA-004 | Coverage | Alta | La cobertura ya esta activa, pero el coverage general es 2.2%. | No existe evidencia suficiente de pruebas automatizadas sobre la mayor parte del codigo. | Incrementar pruebas unitarias, integracion y flujos criticos para mejorar cobertura. |
 | QA-005 | Duplications | Baja | La duplicacion reportada es 1.3%. | Riesgo bajo actualmente. | Mantener monitoreo para evitar crecimiento de duplicacion en futuras iteraciones. |
-| QA-006 | Quality Gate | Media | El Quality Gate aparece como no computado en el primer analisis. | No hay estado final consolidado de aprobacion/rechazo de calidad en este primer analisis. | Ejecutar un nuevo analisis y validar el estado del Quality Gate. |
+| QA-006 | Quality Gate | Alta | El Quality Gate esta en estado Failed con 1 condicion fallida. | El proyecto no cumple los criterios de calidad definidos por Sonar way. | Revisar la condicion fallida y acordar umbrales aceptables para el proyecto. |
+| QA-007 | Security Hotspots | Alta | Existen 6 Security Hotspots en estado To Review. | Pueden representar riesgos si se confirma uso inseguro de codigo o configuracion. | Revisar manualmente cada hotspot y clasificarlo como seguro o riesgo real. |
 
 ## 7. Riesgos Identificados
 
 - Existen issues abiertos de seguridad que requieren revision prioritaria.
+- Existen 6 Security Hotspots pendientes de revision manual.
 - La categoria de confiabilidad presenta una cantidad alta de issues abiertos.
-- No existe reporte de cobertura configurado en SonarCloud.
-- El Quality Gate aun no presenta resultado final computado en el primer analisis.
+- La cobertura esta activa, pero el valor actual de 2.2% es insuficiente para dar confianza automatizada.
+- El Quality Gate esta fallando bajo el perfil `Sonar way`.
 - El analisis fue realizado sobre un fork QA, no directamente sobre el repositorio original.
-- La ausencia de pruebas automatizadas visibles puede dificultar validar regresiones futuras.
+- La baja cobertura puede dificultar validar regresiones futuras.
 
 ## 8. Recomendaciones Para Desarrollo
 
-1. Revisar y priorizar los 4 issues de seguridad reportados por SonarCloud.
+1. Revisar y priorizar los 5 issues de seguridad reportados por SonarCloud.
 2. Clasificar los 74 issues de confiabilidad por severidad e impacto funcional.
-3. Configurar cobertura de pruebas para frontend y backend.
-4. Ejecutar un nuevo analisis para obtener el estado actualizado del Quality Gate.
+3. Revisar manualmente los 6 Security Hotspots pendientes.
+4. Incrementar progresivamente la cobertura de pruebas automatizadas, partiendo por servicios de transacciones, autenticacion, alertas y flujos AML/PEP.
 5. Crear tickets individuales para hallazgos criticos o de alta prioridad.
 6. Validar que el pipeline de analisis se ejecute en cada push y Pull Request.
 7. Mantener este reporte como evidencia QA y actualizarlo despues de cada ciclo relevante de correccion.
@@ -101,20 +109,21 @@ Dashboard principal de SonarCloud:
 
 https://sonarcloud.io/summary/overall?id=DAISORNA_casino-royale&branch=main
 
-Estado de coverage al configurar pruebas frontend en el fork QA:
+Estado de coverage despues de configurar pruebas frontend y GitHub Actions en el fork QA:
 
-| Metrica | Resultado local inicial |
+| Metrica | Resultado actual en SonarCloud |
 | --- | --- |
 | Test runner | Vitest |
 | Reporte generado | `apps/frontend/coverage/lcov.info` |
 | Test files | 2 passed |
 | Tests | 6 passed |
-| Statements | 2.29% |
-| Branches | 3.89% |
-| Functions | 1.11% |
-| Lines | 2.65% |
+| Coverage | 2.2% |
+| Line Coverage | 1.5% |
+| Branch Coverage | 3.9% |
+| Lines to Cover | 1081 |
+| Uncovered Lines | 1065 |
 
-Nota QA: el coverage inicial es bajo porque el proyecto no contaba con pruebas automatizadas previas. La configuracion permite que SonarCloud reciba coverage frontend en el siguiente analisis ejecutado por GitHub Actions. Para backend se requiere crear un proyecto de pruebas .NET y generar reporte OpenCover.
+Nota QA: el coverage inicial es bajo porque el proyecto no contaba con pruebas automatizadas previas. La configuracion ya permite que SonarCloud reciba coverage frontend desde GitHub Actions. Para backend se requiere crear un proyecto de pruebas .NET y generar reporte OpenCover.
 
 Evidencias sugeridas para adjuntar al reporte formal en PDF o Word:
 
@@ -122,12 +131,15 @@ Evidencias sugeridas para adjuntar al reporte formal en PDF o Word:
 - Captura de issues de Security.
 - Captura de issues de Reliability.
 - Captura de Maintainability.
-- Captura de la seccion Coverage no configurada.
-- Captura del estado del Quality Gate despues del siguiente analisis.
+- Captura de la seccion Coverage con 2.2%.
+- Captura del estado del Quality Gate en Failed.
+- Captura de Security Hotspots en estado To Review.
 
 ## 10. Detalle de Issues SonarCloud
 
 La siguiente tabla identifica la ubicacion exacta de cada issue reportado por SonarCloud. Incluye categoria de calidad, severidad, regla, archivo y linea donde se detecta el hallazgo.
+
+Nota: esta tabla corresponde a la extraccion detallada inicial de issues usada como evidencia tecnica. El dashboard vivo de SonarCloud actualmente reporta 139 issues abiertos despues de la configuracion de coverage y debe considerarse la fuente principal para el seguimiento operativo.
 
 | ID | Calidad | Severidad | Tipo | Regla | Archivo | Linea | Hallazgo |
 | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -272,7 +284,31 @@ La siguiente tabla identifica la ubicacion exacta de cada issue reportado por So
 | SQC-139 | SECURITY | MINOR | VULNERABILITY | Web:S5725 | `index.html` | 9 | Make sure not using resource integrity feature is safe here. |
 | SQC-140 | SECURITY | MINOR | VULNERABILITY | Web:S5725 | `pages/oficial.html` | 9 | Make sure not using resource integrity feature is safe here. |
 
-## 11. Criterio Profesional de Actualizacion
+## 11. Resumen Para Presentacion
+
+Este resumen puede usarse como insumo para generar una presentacion ejecutiva o tecnica del avance QA.
+
+| Tema | Mensaje clave |
+| --- | --- |
+| Objetivo | Auditar calidad del proyecto `casino-royale` mediante SonarCloud sin modificar el repositorio original. |
+| Entorno QA | Se trabajo sobre el fork `DAISORNA/casino-royale`. |
+| Automatizacion | Se configuro GitHub Actions para ejecutar pruebas, build y analisis SonarCloud. |
+| Coverage | La cobertura ya se visualiza en SonarCloud con 2.2% general. |
+| Quality Gate | El estado actual es Failed con 1 condicion fallida. |
+| Riesgo principal | Baja cobertura automatizada y issues abiertos en seguridad/confiabilidad. |
+| Seguridad | 5 Security Issues y 6 Security Hotspots pendientes de revision. |
+| Confiabilidad | 74 Reliability Issues abiertos. |
+| Mantenibilidad | Rating A con 70 issues abiertos, riesgo controlado pero con deuda tecnica. |
+| Duplicacion | 1.3%, valor bajo y aceptable inicialmente. |
+| Recomendacion | Priorizar seguridad, revisar hotspots, crear pruebas sobre flujos criticos y reanalizar. |
+
+Mensaje sugerido para presentacion:
+
+```txt
+Se implemento una auditoria QA sobre un fork controlado del proyecto. SonarCloud ya esta integrado con GitHub Actions y recibe coverage automaticamente. El proyecto cuenta ahora con medicion objetiva, pero el Quality Gate falla y la cobertura general es baja, por lo que se recomienda priorizar seguridad, confiabilidad y ampliacion de pruebas automatizadas.
+```
+
+## 12. Criterio Profesional de Actualizacion
 
 Este archivo debe mantenerse como reporte QA principal del proyecto.
 
@@ -289,15 +325,16 @@ Ejemplo recomendado:
 - `docs/qa/reports/QA_REPORT_2026-05-26.pdf`: evidencia formal cerrada para una entrega especifica.
 - Issues de GitHub/Jira: seguimiento operativo de cada hallazgo critico.
 
-## 12. Historial de Revisiones
+## 13. Historial de Revisiones
 
 | Version | Fecha | Autor | Cambio |
 | --- | --- | --- | --- |
 | 1.0 | 2026-05-26 | David Ortega | Creacion inicial del reporte QA con resultados de SonarCloud. |
 | 1.1 | 2026-05-27 | David Ortega | Se agrega detalle de issues por archivo/linea y estado inicial de coverage frontend. |
+| 1.2 | 2026-05-27 | David Ortega | Se actualizan metricas con coverage activo, Quality Gate fallido y resumen para presentacion. |
 
-## 13. Conclusion
+## 14. Conclusion
 
-El proyecto cuenta con una base analizable en SonarQube Cloud y presenta una duplicacion baja. Sin embargo, existen riesgos relevantes en seguridad y confiabilidad que deben ser revisados por el equipo de desarrollo.
+El proyecto cuenta con analisis automatico en SonarQube Cloud mediante GitHub Actions y presenta una duplicacion baja. Sin embargo, el Quality Gate actual esta en estado Failed y existen riesgos relevantes en seguridad, hotspots pendientes, confiabilidad y baja cobertura automatizada.
 
-La prioridad recomendada es revisar los issues de seguridad, atender los hallazgos de confiabilidad con mayor impacto, configurar cobertura de pruebas y ejecutar un nuevo analisis para obtener el estado definitivo del Quality Gate.
+La prioridad recomendada es revisar los issues de seguridad, evaluar los Security Hotspots, atender los hallazgos de confiabilidad con mayor impacto e incrementar la cobertura de pruebas sobre los flujos criticos del sistema.
