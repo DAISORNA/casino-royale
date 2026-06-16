@@ -62,11 +62,33 @@ public sealed class TransactionService : ITransactionService
 
         _repository.AddTransaction(record);
 
-        var alertRaised = false;
+        var alertRaised = TryAddAlert(screening, type, request, clientHash);
+        TryAddStructuringAlert(clientHash, request);
+        TryAddRte(requiresRte, request, clientHash, record);
+
+        _auditLogger.Log(actor, $"{type} registrado", $"Estado final {status}");
+
+        return new TransactionResponse(
+            record.Id,
+            clientHash,
+            screening.Level,
+            status,
+            requiresKyc,
+            requiresRte,
+            alertRaised,
+            BuildStatusMessage(status, requiresRte));
+    }
+
+    public Task<ScreeningResult> ScreeningOnlyAsync(ScreeningRunRequest request, CancellationToken cancellationToken)
+        => _riskConsolidator.RunAsync(request.ClientName, cancellationToken);
+
+    private bool TryAddAlert(ScreeningResult screening, TransactionType type, TransactionRequest request, string clientHash)
+    {
+        var added = false;
 
         if (screening.Level == RiskLevel.Rojo)
         {
-            alertRaised = true;
+            added = true;
             _repository.AddAlert(new AlertRecord
             {
                 Type = AlertType.Aml,
@@ -81,7 +103,7 @@ public sealed class TransactionService : ITransactionService
 
         if (screening.Level == RiskLevel.Amarillo)
         {
-            alertRaised = true;
+            added = true;
             _repository.AddAlert(new AlertRecord
             {
                 Type = screening.TimedOut ? AlertType.Timeout : AlertType.Pep,
@@ -98,7 +120,7 @@ public sealed class TransactionService : ITransactionService
 
         if (type == TransactionType.CashOut && request.ChipsPlayedRatio is decimal ratio && ratio < 0.2m)
         {
-            alertRaised = true;
+            added = true;
             _repository.AddAlert(new AlertRecord
             {
                 Type = AlertType.Comportamiento,
@@ -111,13 +133,20 @@ public sealed class TransactionService : ITransactionService
             });
         }
 
+        return added;
+    }
+
+    private void TryAddStructuringAlert(string clientHash, TransactionRequest request)
+    {
         var structuring = _structuringDetector.Detect(clientHash, request.Amount, _repository.Transactions);
         if (structuring is not null)
         {
-            alertRaised = true;
             _repository.AddAlert(structuring);
         }
+    }
 
+    private void TryAddRte(bool requiresRte, TransactionRequest request, string clientHash, TransactionRecord record)
+    {
         if (requiresRte && !string.IsNullOrWhiteSpace(request.OriginOfFunds))
         {
             _repository.AddRte(new RteRecord
@@ -130,24 +159,14 @@ public sealed class TransactionService : ITransactionService
                 TransactionIds = new[] { record.Id }
             });
         }
-
-        _auditLogger.Log(actor, $"{type} registrado", $"Estado final {status}");
-
-        return new TransactionResponse(
-            record.Id,
-            clientHash,
-            screening.Level,
-            status,
-            requiresKyc,
-            requiresRte,
-            alertRaised,
-            status == TransactionStatus.Bloqueada
-                ? "Operacion bloqueada por screening AML."
-                : requiresRte
-                    ? "Operacion registrada y enviada a flujo RTE."
-                    : "Operacion registrada correctamente.");
     }
 
-    public Task<ScreeningResult> ScreeningOnlyAsync(ScreeningRunRequest request, CancellationToken cancellationToken)
-        => _riskConsolidator.RunAsync(request.ClientName, cancellationToken);
+    private static string BuildStatusMessage(TransactionStatus status, bool requiresRte)
+    {
+        if (status == TransactionStatus.Bloqueada)
+            return "Operacion bloqueada por screening AML.";
+        if (requiresRte)
+            return "Operacion registrada y enviada a flujo RTE.";
+        return "Operacion registrada correctamente.";
+    }
 }

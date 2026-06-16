@@ -29,12 +29,10 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
-builder.Services.AddAuthorization(options =>
-{
-    options.AddPolicy(Policies.OperatorAccess, policy => policy.RequireRole("Cajero", "Dealer", "Supervisor", "Administrador"));
-    options.AddPolicy(Policies.OfficerAccess, policy => policy.RequireRole("Oficial", "Administrador"));
-    options.AddPolicy(Policies.RosAccess, policy => policy.RequireRole("Oficial", "Supervisor", "Administrador"));
-});
+builder.Services.AddAuthorizationBuilder()
+    .AddPolicy(Policies.OperatorAccess, policy => policy.RequireRole("Cajero", "Dealer", "Supervisor", "Administrador"))
+    .AddPolicy(Policies.OfficerAccess, policy => policy.RequireRole("Oficial", "Administrador"))
+    .AddPolicy(Policies.RosAccess, policy => policy.RequireRole("Oficial", "Supervisor", "Administrador"));
 
 builder.Services.AddSingleton(signingKey);
 builder.Services.AddSingleton<IAuditLogger, InMemoryAuditLogger>();

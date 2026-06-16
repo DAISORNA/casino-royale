@@ -2,20 +2,22 @@ namespace CasinoDesk.Api.Services;
 
 public sealed class MockAmlScreeningProvider : IScreeningProvider
 {
+    private static readonly string[] OfacMatch = ["OFAC SDN List"];
+
     public Task<IReadOnlyCollection<string>> CheckAsync(string normalizedClientName, CancellationToken cancellationToken)
     {
         if (normalizedClientName.Contains("OFAC") || normalizedClientName.Contains("SANCIONADO"))
         {
-            return Task.FromResult<IReadOnlyCollection<string>>(new[] { "OFAC SDN List" });
+            return Task.FromResult<IReadOnlyCollection<string>>(OfacMatch);
         }
 
         if (normalizedClientName.Contains("TIMEOUT"))
         {
             return Task.Delay(TimeSpan.FromSeconds(5), cancellationToken)
-                .ContinueWith<IReadOnlyCollection<string>>(_ => Array.Empty<string>(), cancellationToken);
+                .ContinueWith<IReadOnlyCollection<string>>(_ => [], cancellationToken);
         }
 
-        return Task.FromResult<IReadOnlyCollection<string>>(Array.Empty<string>());
+        return Task.FromResult<IReadOnlyCollection<string>>([]);
     }
 }
 

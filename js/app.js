@@ -131,85 +131,81 @@ function resetBuyinModal() {
     document.getElementById('buyinKycWarning').classList.add('hidden');
 }
 
-function buyinNext() {
-    const step = state.buyinStep;
+function handleStep1() {
+    const monto = parseCurrency(document.getElementById('buyinMonto').value);
     
-    if (step === 1) {
-        const monto = parseCurrency(document.getElementById('buyinMonto').value);
-        
-        // Validate monto
-        if (!monto || monto <= 0) {
-            document.getElementById('buyinMonto').style.borderColor = 'var(--status-red)';
-            return;
-        }
-        
-        document.getElementById('buyinMonto').style.borderColor = '';
-        
-        // Show KYC warning if >= 2000
-        if (monto >= 2000) {
-            document.getElementById('buyinKycWarning').classList.remove('hidden');
-        }
-        
-        // Update confirmation data
-        document.getElementById('confirmMonto').textContent = formatCurrencyDisplay(monto);
-        document.getElementById('confirmInstr').textContent = getSelectedRadio('buyinInstr') || 'Efectivo';
-        document.getElementById('confirmCliente').textContent = document.getElementById('buyinNombre').value || 'Cliente';
-        
-        // If KYC required, go to step 2, else step 3
-        if (monto >= 2000) {
-            state.buyinStep = 2;
-            document.getElementById('buyinStep1').classList.add('hidden');
-            document.getElementById('buyinStep2').classList.remove('hidden');
-            document.getElementById('buyinBack').style.display = 'block';
-        } else {
-            state.buyinStep = 3;
-            document.getElementById('buyinStep1').classList.add('hidden');
-            document.getElementById('buyinStep3').classList.remove('hidden');
-            document.getElementById('buyinBack').style.display = 'block';
-            document.getElementById('buyinNext').textContent = 'Entregar fichas y registrar';
-        }
-        
-    } else if (step === 2) {
-        // Validate identification
-        const doc = document.getElementById('buyinDoc').value;
-        const nombre = document.getElementById('buyinNombre').value;
-        
-        if (!doc || !nombre) {
-            if (!doc) document.getElementById('buyinDoc').style.borderColor = 'var(--status-red)';
-            if (!nombre) document.getElementById('buyinNombre').style.borderColor = 'var(--status-red)';
-            return;
-        }
-        
-        document.getElementById('buyinDoc').style.borderColor = '';
-        document.getElementById('buyinNombre').style.borderColor = '';
-        
-        // Update confirmation
-        document.getElementById('confirmCliente').textContent = nombre;
-        
+    if (!monto || monto <= 0) {
+        document.getElementById('buyinMonto').style.borderColor = 'var(--status-red)';
+        return;
+    }
+    
+    document.getElementById('buyinMonto').style.borderColor = '';
+    
+    if (monto >= 2000) {
+        document.getElementById('buyinKycWarning').classList.remove('hidden');
+    }
+    
+    document.getElementById('confirmMonto').textContent = formatCurrencyDisplay(monto);
+    document.getElementById('confirmInstr').textContent = getSelectedRadio('buyinInstr') || 'Efectivo';
+    document.getElementById('confirmCliente').textContent = document.getElementById('buyinNombre').value || 'Cliente';
+    
+    if (monto >= 2000) {
+        state.buyinStep = 2;
+        document.getElementById('buyinStep1').classList.add('hidden');
+        document.getElementById('buyinStep2').classList.remove('hidden');
+        document.getElementById('buyinBack').style.display = 'block';
+    } else {
         state.buyinStep = 3;
-        document.getElementById('buyinStep2').classList.add('hidden');
+        document.getElementById('buyinStep1').classList.add('hidden');
         document.getElementById('buyinStep3').classList.remove('hidden');
+        document.getElementById('buyinBack').style.display = 'block';
         document.getElementById('buyinNext').textContent = 'Entregar fichas y registrar';
-        
-    } else if (step === 3) {
-        // Complete transaction
-        const monto = parseCurrency(document.getElementById('buyinMonto').value);
-        const cliente = document.getElementById('buyinNombre').value || 'Cliente';
-        const hash = document.getElementById('buyinHash')?.value || generateHash();
-        
-        // Add to transactions list
-        addTransaction({
-            hora: new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }),
-            tipo: 'Buy-in',
-            cliente: cliente.split(' ').slice(0, 2).join(' '),
-            hash: hash,
-            monto: formatCurrencyDisplay(monto),
-            status: 'green'
-        });
-        
-        // Show receipt
-        closeModal('buyinModal');
-        setTimeout(() => openModal('receiptModal'), 300);
+    }
+}
+
+function handleStep2() {
+    const doc = document.getElementById('buyinDoc').value;
+    const nombre = document.getElementById('buyinNombre').value;
+    
+    if (!doc || !nombre) {
+        if (!doc) document.getElementById('buyinDoc').style.borderColor = 'var(--status-red)';
+        if (!nombre) document.getElementById('buyinNombre').style.borderColor = 'var(--status-red)';
+        return;
+    }
+    
+    document.getElementById('buyinDoc').style.borderColor = '';
+    document.getElementById('buyinNombre').style.borderColor = '';
+    document.getElementById('confirmCliente').textContent = nombre;
+    
+    state.buyinStep = 3;
+    document.getElementById('buyinStep2').classList.add('hidden');
+    document.getElementById('buyinStep3').classList.remove('hidden');
+    document.getElementById('buyinNext').textContent = 'Entregar fichas y registrar';
+}
+
+function handleStep3() {
+    const monto = parseCurrency(document.getElementById('buyinMonto').value);
+    const cliente = document.getElementById('buyinNombre').value || 'Cliente';
+    const hash = document.getElementById('buyinHash')?.value || generateHash();
+    
+    addTransaction({
+        hora: new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }),
+        tipo: 'Buy-in',
+        cliente: cliente.split(' ').slice(0, 2).join(' '),
+        hash: hash,
+        monto: formatCurrencyDisplay(monto),
+        status: 'green'
+    });
+    
+    closeModal('buyinModal');
+    setTimeout(() => openModal('receiptModal'), 300);
+}
+
+function buyinNext() {
+    switch (state.buyinStep) {
+        case 1: handleStep1(); break;
+        case 2: handleStep2(); break;
+        case 3: handleStep3(); break;
     }
 }
 
