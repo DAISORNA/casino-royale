@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { useAppStore } from "../app/store";
+import type { RiskLevel } from "../app/types";
 import { RiskBadge } from "./RiskBadge";
 
 function formatCurrency(value: number) {
@@ -24,8 +25,8 @@ function ModalShell({
   if (!isOpen) return null;
 
   return (
-    <dialog className="modal-overlay active" onClick={onClose}>
-      <div className="modal" style={{ maxWidth }} onClick={(event) => event.stopPropagation()}>
+    <dialog className="modal-overlay active" onClick={onClose} onKeyDown={(event) => { if (event.key === "Escape") onClose(); }}>
+      <div className="modal" style={{ maxWidth }} onClick={(event) => event.stopPropagation()} role="document" tabIndex={0} onKeyDown={(event) => event.stopPropagation()}>
         <div className="modal__header">
           <h2 className="modal__title text-gold">{title}</h2>
           <button className="modal__close" onClick={onClose} type="button">
@@ -50,7 +51,7 @@ interface BuyInFormState {
   originOfFunds: string;
   captureMode: "QR" | "MANUAL";
   proportionality: "PROPORCIONAL" | "NO_PROPORCIONAL";
-  riskLevel: "VERDE" | "AMARILLO" | "ROJO";
+  riskLevel: RiskLevel;
 }
 
 const INITIAL_STATE: BuyInFormState = {
