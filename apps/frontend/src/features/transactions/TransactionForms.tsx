@@ -18,7 +18,7 @@ const transactionSchema = z.object({
 
 type TransactionFormValues = z.infer<typeof transactionSchema>;
 
-function ScreeningSummary({ result }: { result: ScreeningResult | null }) {
+function ScreeningSummary({ result }: { readonly result: ScreeningResult | null }) {
   if (!result) {
     return (
       <div className="list-item">

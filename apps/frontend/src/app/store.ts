@@ -172,7 +172,7 @@ function makeAudit(actor: string, event: string, result: string): AuditEvent {
 const UI_PREFERENCES_KEY = "casinodesk.uiPreferences";
 
 function readUiPreferences(): UiPreferences {
-  if (typeof globalThis === "undefined" || typeof globalThis.window === "undefined") {
+  if (globalThis.window === undefined) {
     return { themeMode: "light", accentColor: "#d4af37" };
   }
 
@@ -193,7 +193,7 @@ function readUiPreferences(): UiPreferences {
 }
 
 function persistUiPreferences(preferences: UiPreferences) {
-  if (typeof globalThis === "undefined" || typeof globalThis.window === "undefined") return;
+  if (globalThis.window === undefined) return;
   globalThis.window.localStorage.setItem(UI_PREFERENCES_KEY, JSON.stringify(preferences));
 }
 

@@ -41,7 +41,7 @@ function useClock() {
   return time;
 }
 
-function SidebarLink({ to, label, icon: Icon }: { to: string; label: string; icon: typeof LayoutDashboard }) {
+function SidebarLink({ to, label, icon: Icon }: { readonly to: string; readonly label: string; readonly icon: typeof LayoutDashboard }) {
   return (
     <NavLink to={to} end={to === "/"} className={({ isActive }) => `sidebar__item ${isActive ? "active" : ""}`}>
       <Icon size={20} />
@@ -55,9 +55,9 @@ function SidebarAction({
   icon: Icon,
   onClick
 }: {
-  label: string;
-  icon: typeof LayoutDashboard;
-  onClick: () => void;
+  readonly label: string;
+  readonly icon: typeof LayoutDashboard;
+  readonly onClick: () => void;
 }) {
   return (
     <button className="sidebar__item sidebar__item--button" onClick={onClick} type="button">
@@ -116,8 +116,10 @@ function buildNavigation(role: Role) {
 
   const compliance: NavItem[] = [];
   if (capabilities.canAccessPrivateCompliance) {
-    compliance.push({ to: "/official", label: "Dashboard oficial", icon: ShieldAlert });
-    compliance.push({ to: "/alerts", label: "Alertas y ROS", icon: Bell });
+    compliance.push(
+      { to: "/official", label: "Dashboard oficial", icon: ShieldAlert },
+      { to: "/alerts", label: "Alertas y ROS", icon: Bell }
+    );
   }
   if (role === "Administrador") {
     compliance.push({ to: "/admin", label: "Gobierno AML", icon: BriefcaseBusiness });

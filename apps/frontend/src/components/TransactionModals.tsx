@@ -14,12 +14,12 @@ function ModalShell({
   children,
   footer
 }: {
-  isOpen: boolean;
-  title: string;
-  maxWidth?: number;
-  onClose: () => void;
-  children: React.ReactNode;
-  footer?: React.ReactNode;
+  readonly isOpen: boolean;
+  readonly title: string;
+  readonly maxWidth?: number;
+  readonly onClose: () => void;
+  readonly children: React.ReactNode;
+  readonly footer?: React.ReactNode;
 }) {
   if (!isOpen) return null;
 
@@ -44,9 +44,9 @@ export function BuyInModal({
   onClose,
   onSuccess
 }: {
-  isOpen: boolean;
-  onClose: () => void;
-  onSuccess: () => void;
+  readonly isOpen: boolean;
+  readonly onClose: () => void;
+  readonly onSuccess: () => void;
 }) {
   const submitTransaction = useAppStore((state) => state.submitTransaction);
   const session = useAppStore((state) => state.session);
@@ -308,7 +308,7 @@ export function BuyInModal({
   );
 }
 
-export function CashOutModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
+export function CashOutModal({ isOpen, onClose }: { readonly isOpen: boolean; readonly onClose: () => void }) {
   const submitTransaction = useAppStore((state) => state.submitTransaction);
   const [amount] = useState(3000);
   const [documentNumber, setDocumentNumber] = useState("8-902-1547");
@@ -444,7 +444,7 @@ export function CashOutModal({ isOpen, onClose }: { isOpen: boolean; onClose: ()
   );
 }
 
-export function ManualAlertModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
+export function ManualAlertModal({ isOpen, onClose }: { readonly isOpen: boolean; readonly onClose: () => void }) {
   const createManualAlert = useAppStore((state) => state.createManualAlert);
   const session = useAppStore((state) => state.session);
   const [title, setTitle] = useState("Comportamiento sospechoso en sala");
@@ -505,7 +505,7 @@ export function ManualAlertModal({ isOpen, onClose }: { isOpen: boolean; onClose
   );
 }
 
-export function ReceiptModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
+export function ReceiptModal({ isOpen, onClose }: { readonly isOpen: boolean; readonly onClose: () => void }) {
   const session = useAppStore((state) => state.session);
 
   return (

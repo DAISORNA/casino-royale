@@ -12,7 +12,7 @@ const dotClasses: Record<RiskLevel, string> = {
   ROJO: "risk-dot risk-red"
 };
 
-export function RiskBadge({ risk }: { risk: RiskLevel }) {
+export function RiskBadge({ risk }: { readonly risk: RiskLevel }) {
   return (
     <span className={badgeClasses[risk]}>
       <span className={dotClasses[risk]} />
