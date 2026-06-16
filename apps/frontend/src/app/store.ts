@@ -256,6 +256,45 @@ function buildBehaviorAlert(clientHash: string, amount: number, transactionId: s
   };
 }
 
+function buildRteRecord(input: NewTransactionInput, clientHash: string, transactionId: string): RteRecord {
+  return {
+    id: `rte-${Date.now()}`,
+    clientHash,
+    totalAmount: input.amount,
+    originOfFunds: input.originOfFunds!,
+    signedByClient: true,
+    approvedByOfficer: false,
+    transactionIds: [transactionId],
+    folio: `RTE-${new Date().getFullYear()}-${Date.now().toString().slice(-5)}`,
+    createdAt: new Date().toISOString(),
+    status: "PENDIENTE"
+  };
+}
+
+async function submitTransactionToBackend(input: NewTransactionInput): Promise<boolean> {
+  try {
+    const payload = {
+      clientName: input.clientDisplayName,
+      documentNumber: input.documentNumber,
+      amount: input.amount,
+      paymentMethod: input.paymentMethod.charAt(0) + input.paymentMethod.slice(1).toLowerCase(),
+      originOfFunds: input.originOfFunds,
+      justification: input.justification,
+      chipsPlayedRatio: input.chipsPlayedRatio
+    };
+
+    if (input.type === "BUY_IN") {
+      await createBuyIn(payload);
+    } else {
+      await createCashOut(payload);
+    }
+
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 function buildFractioningAlert(
   clientHash: string,
   amount: number,
@@ -420,46 +459,16 @@ export const useAppStore = create<AppState>((set, get) => ({
 
     const newRtes =
       requiresRte && input.originOfFunds
-        ? [
-            {
-              id: `rte-${Date.now()}`,
-              clientHash,
-              totalAmount: input.amount,
-              originOfFunds: input.originOfFunds,
-              signedByClient: true,
-              approvedByOfficer: false,
-              transactionIds: [transaction.id],
-              folio: `RTE-${new Date().getFullYear()}-${Date.now().toString().slice(-5)}`,
-              createdAt: new Date().toISOString(),
-              status: "PENDIENTE" as const
-            },
-            ...get().rtes
-          ]
+        ? [buildRteRecord(input, clientHash, transaction.id), ...get().rtes]
         : get().rtes;
 
     if (get().backendAvailable) {
-      try {
-        const payload = {
-          clientName: input.clientDisplayName,
-          documentNumber: input.documentNumber,
-          amount: input.amount,
-          paymentMethod: input.paymentMethod.charAt(0) + input.paymentMethod.slice(1).toLowerCase(),
-          originOfFunds: input.originOfFunds,
-          justification: input.justification,
-          chipsPlayedRatio: input.chipsPlayedRatio
-        };
-
-        if (input.type === "BUY_IN") {
-          await createBuyIn(payload);
-        } else {
-          await createCashOut(payload);
-        }
-
+      const submitted = await submitTransactionToBackend(input);
+      if (submitted) {
         await get().hydrate();
         return screening;
-      } catch {
-        set({ backendAvailable: false });
       }
+      set({ backendAvailable: false });
     }
 
     set({
