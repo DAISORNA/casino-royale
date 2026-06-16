@@ -311,5 +311,7 @@ export function AppShell() {
 export function useAppChrome() {
   const chromeContext = useContext(AppChromeContext);
   const outletContext = useOutletContext<AppChromeContextType | null>();
-  return chromeContext ?? outletContext;
+  const context = chromeContext ?? outletContext;
+  if (!context) throw new Error("useAppChrome must be used within AppShell");
+  return context;
 }
