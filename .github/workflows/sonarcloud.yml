@@ -42,7 +42,8 @@ jobs:
             /d:sonar.host.url="https://sonarcloud.io" \
             /d:sonar.token="${SONAR_TOKEN}" \
             /d:sonar.javascript.lcov.reportPaths="apps/frontend/coverage/lcov.info" \
-            /d:sonar.exclusions="**/node_modules/**,**/dist/**,**/coverage/**,**/bin/**,**/obj/**"
+            /d:sonar.exclusions="**/node_modules/**,**/dist/**,**/coverage/**,**/bin/**,**/obj/**" \
+            /d:sonar.coverage.exclusions="**/apps/backend/**,**/index.html,**/pages/**,**/css/**,**/js/**"
 
       - name: Run frontend tests with coverage
         run: npm run test:coverage
