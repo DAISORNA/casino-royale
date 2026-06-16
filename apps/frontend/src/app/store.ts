@@ -197,6 +197,90 @@ function persistUiPreferences(preferences: UiPreferences) {
   globalThis.window.localStorage.setItem(UI_PREFERENCES_KEY, JSON.stringify(preferences));
 }
 
+function buildRedAlert(clientHash: string, amount: number, transactionId: string): AlertItem {
+  return {
+    id: `alt-${Date.now()}-aml`,
+    type: "AML",
+    title: "Transaccion bloqueada por screening",
+    severity: "CRITICA",
+    risk: "ROJO",
+    createdAt: new Date().toISOString(),
+    description: "Coincidencia detectada en listas AML o sanciones internacionales.",
+    clientHash,
+    amount,
+    status: "ABIERTA",
+    source: "AUTOMATICA",
+    createdBy: "Sistema AML",
+    assignedRole: "Oficial",
+    relatedTransactionIds: [transactionId]
+  };
+}
+
+function buildYellowAlert(screening: ScreeningResult, clientHash: string, amount: number, transactionId: string): AlertItem {
+  return {
+    id: `alt-${Date.now()}-pep`,
+    type: screening.timeout ? "TIMEOUT" : "PEP",
+    title: screening.timeout ? "Timeout precautorio AML" : "PEP o riesgo reforzado",
+    severity: "ALTA",
+    risk: "AMARILLO",
+    createdAt: new Date().toISOString(),
+    description: screening.timeout
+      ? "Proveedor externo no respondio tras el reintento. Caso retenido por precaucion."
+      : "Evaluar proporcionalidad del monto, origen de fondos y aprobacion privada del oficial.",
+    clientHash,
+    amount,
+    status: "ABIERTA",
+    source: "AUTOMATICA",
+    createdBy: "Sistema AML",
+    assignedRole: "Oficial",
+    relatedTransactionIds: [transactionId]
+  };
+}
+
+function buildBehaviorAlert(clientHash: string, amount: number, transactionId: string): AlertItem {
+  return {
+    id: `alt-${Date.now()}-comp`,
+    type: "COMPORTAMIENTO",
+    title: "Uso anomalo de fichas",
+    severity: "ALTA",
+    risk: "AMARILLO",
+    createdAt: new Date().toISOString(),
+    description: "El jugador aposto menos del 20% de las fichas compradas y requiere evaluacion discreta.",
+    clientHash,
+    amount,
+    status: "ABIERTA",
+    source: "AUTOMATICA",
+    createdBy: "Sistema AML",
+    assignedRole: "Oficial",
+    relatedTransactionIds: [transactionId]
+  };
+}
+
+function buildFractioningAlert(
+  clientHash: string,
+  amount: number,
+  accumulatedAmount: number,
+  transactionId: string,
+  priorIds: string[]
+): AlertItem {
+  return {
+    id: `alt-${Date.now()}-frac`,
+    type: "FRACCIONAMIENTO",
+    title: "Patron de fraccionamiento detectado",
+    severity: "CRITICA",
+    risk: "AMARILLO",
+    createdAt: new Date().toISOString(),
+    description: "Tres o mas transacciones menores al umbral en 24 horas entre caja y mesa.",
+    clientHash,
+    amount: accumulatedAmount,
+    status: "ABIERTA",
+    source: "AUTOMATICA",
+    createdBy: "Sistema AML",
+    assignedRole: "Oficial",
+    relatedTransactionIds: [transactionId, ...priorIds]
+  };
+}
+
 export const useAppStore = create<AppState>((set, get) => ({
   session: null,
   backendAvailable: false,
@@ -311,62 +395,15 @@ export const useAppStore = create<AppState>((set, get) => ({
     const newAlerts: AlertItem[] = [];
 
     if (screening.level === "ROJO") {
-      newAlerts.push({
-        id: `alt-${Date.now()}-aml`,
-        type: "AML",
-        title: "Transaccion bloqueada por screening",
-        severity: "CRITICA",
-        risk: "ROJO",
-        createdAt: new Date().toISOString(),
-        description: "Coincidencia detectada en listas AML o sanciones internacionales.",
-        clientHash,
-        amount: input.amount,
-        status: "ABIERTA",
-        source: "AUTOMATICA",
-        createdBy: "Sistema AML",
-        assignedRole: "Oficial",
-        relatedTransactionIds: [transaction.id]
-      });
+      newAlerts.push(buildRedAlert(clientHash, input.amount, transaction.id));
     }
 
     if (screening.level === "AMARILLO") {
-      newAlerts.push({
-        id: `alt-${Date.now()}-pep`,
-        type: screening.timeout ? "TIMEOUT" : "PEP",
-        title: screening.timeout ? "Timeout precautorio AML" : "PEP o riesgo reforzado",
-        severity: "ALTA",
-        risk: "AMARILLO",
-        createdAt: new Date().toISOString(),
-        description: screening.timeout
-          ? "Proveedor externo no respondio tras el reintento. Caso retenido por precaucion."
-          : "Evaluar proporcionalidad del monto, origen de fondos y aprobacion privada del oficial.",
-        clientHash,
-        amount: input.amount,
-        status: "ABIERTA",
-        source: "AUTOMATICA",
-        createdBy: "Sistema AML",
-        assignedRole: "Oficial",
-        relatedTransactionIds: [transaction.id]
-      });
+      newAlerts.push(buildYellowAlert(screening, clientHash, input.amount, transaction.id));
     }
 
     if (input.type === "CASH_OUT" && typeof input.chipsPlayedRatio === "number" && input.chipsPlayedRatio < 0.2) {
-      newAlerts.push({
-        id: `alt-${Date.now()}-comp`,
-        type: "COMPORTAMIENTO",
-        title: "Uso anomalo de fichas",
-        severity: "ALTA",
-        risk: "AMARILLO",
-        createdAt: new Date().toISOString(),
-        description: "El jugador aposto menos del 20% de las fichas compradas y requiere evaluacion discreta.",
-        clientHash,
-        amount: input.amount,
-        status: "ABIERTA",
-        source: "AUTOMATICA",
-        createdBy: "Sistema AML",
-        assignedRole: "Oficial",
-        relatedTransactionIds: [transaction.id]
-      });
+      newAlerts.push(buildBehaviorAlert(clientHash, input.amount, transaction.id));
     }
 
     const priorSmallTransactions = get().transactions.filter(
@@ -377,22 +414,8 @@ export const useAppStore = create<AppState>((set, get) => ({
     );
 
     if (input.amount < 2000 && priorSmallTransactions.length >= 2) {
-      newAlerts.push({
-        id: `alt-${Date.now()}-frac`,
-        type: "FRACCIONAMIENTO",
-        title: "Patron de fraccionamiento detectado",
-        severity: "CRITICA",
-        risk: "AMARILLO",
-        createdAt: new Date().toISOString(),
-        description: "Tres o mas transacciones menores al umbral en 24 horas entre caja y mesa.",
-        clientHash,
-        amount: input.amount + priorSmallTransactions.reduce((sum, item) => sum + item.amount, 0),
-        status: "ABIERTA",
-        source: "AUTOMATICA",
-        createdBy: "Sistema AML",
-        assignedRole: "Oficial",
-        relatedTransactionIds: [transaction.id, ...priorSmallTransactions.map((item) => item.id)]
-      });
+      const totalAmount = input.amount + priorSmallTransactions.reduce((sum, item) => sum + item.amount, 0);
+      newAlerts.push(buildFractioningAlert(clientHash, input.amount, totalAmount, transaction.id, priorSmallTransactions.map((item) => item.id)));
     }
 
     const newRtes =
