@@ -25,8 +25,8 @@ function ModalShell({
   if (!isOpen) return null;
 
   return (
-    <dialog className="modal-overlay active" onClick={onClose} onKeyDown={(event) => { if (event.key === "Escape") onClose(); }}>
-      <div className="modal" style={{ maxWidth }} onClick={(event) => event.stopPropagation()} role="document" tabIndex={0} onKeyDown={(event) => event.stopPropagation()}>
+    <dialog className="modal-overlay active" onClick={(event) => { if (event.target === event.currentTarget) onClose(); }}>
+      <div className="modal" style={{ maxWidth }}>
         <div className="modal__header">
           <h2 className="modal__title text-gold">{title}</h2>
           <button className="modal__close" onClick={onClose} type="button">
