@@ -1,23 +1,34 @@
+import { describe, it, expect } from "vitest";
 import { render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
 import { RiskBadge } from "./RiskBadge";
 
 describe("RiskBadge", () => {
-  it("renders the green risk state", () => {
-    render(<RiskBadge risk="VERDE" />);
-
-    expect(screen.getByText("VERDE")).toHaveClass("badge-green");
+  it("renders green state with class badge-green", () => {
+    const { container } = render(<RiskBadge risk="VERDE" />);
+    expect(screen.getByText("VERDE")).toBeDefined();
+    expect(container.querySelector(".badge-green")).toBeTruthy();
   });
 
-  it("renders the yellow risk state", () => {
-    render(<RiskBadge risk="AMARILLO" />);
-
-    expect(screen.getByText("AMARILLO")).toHaveClass("badge-yellow");
+  it("renders yellow state with class badge-yellow", () => {
+    const { container } = render(<RiskBadge risk="AMARILLO" />);
+    expect(screen.getByText("AMARILLO")).toBeDefined();
+    expect(container.querySelector(".badge-yellow")).toBeTruthy();
   });
 
-  it("renders the red risk state", () => {
-    render(<RiskBadge risk="ROJO" />);
+  it("renders red state with class badge-red", () => {
+    const { container } = render(<RiskBadge risk="ROJO" />);
+    expect(screen.getByText("ROJO")).toBeDefined();
+    expect(container.querySelector(".badge-red")).toBeTruthy();
+  });
 
-    expect(screen.getByText("ROJO")).toHaveClass("badge-red");
+  it("renders correct dot class for each risk level", () => {
+    const { container: greenContainer } = render(<RiskBadge risk="VERDE" />);
+    expect(greenContainer.querySelector(".risk-green")).toBeTruthy();
+
+    const { container: yellowContainer } = render(<RiskBadge risk="AMARILLO" />);
+    expect(yellowContainer.querySelector(".risk-yellow")).toBeTruthy();
+
+    const { container: redContainer } = render(<RiskBadge risk="ROJO" />);
+    expect(redContainer.querySelector(".risk-red")).toBeTruthy();
   });
 });

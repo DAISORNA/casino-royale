@@ -2,9 +2,30 @@ import { CircleDollarSign, CreditCard, ShieldAlert, Users } from "lucide-react";
 import { useAppStore } from "../../app/store";
 import { useAppChrome } from "../../components/AppShell";
 import { RiskBadge } from "../../components/RiskBadge";
+import type { RiskLevel } from "../../app/types";
 
 function formatCurrency(value: number) {
   return `$${value.toLocaleString("en-US")}`;
+}
+
+const indicatorClasses: Record<RiskLevel, string> = {
+  ROJO: "alert-panel__indicator--red",
+  AMARILLO: "alert-panel__indicator--yellow",
+  VERDE: "alert-panel__indicator--green"
+};
+
+function indicatorClass(risk: RiskLevel): string {
+  return indicatorClasses[risk];
+}
+
+const textClasses: Record<RiskLevel, string> = {
+  ROJO: "alert-panel__type text-danger",
+  AMARILLO: "alert-panel__type text-warning",
+  VERDE: "alert-panel__type text-success"
+};
+
+function textClass(risk: RiskLevel): string {
+  return textClasses[risk];
 }
 
 export function OperatorDashboardPage() {
@@ -183,25 +204,9 @@ export function OperatorDashboardPage() {
             <ul className="alert-panel__list">
               {alerts.slice(0, 4).map((alert) => (
                 <li className="alert-panel__item" key={alert.id}>
-                  <div
-                    className={`alert-panel__indicator ${
-                      alert.risk === "ROJO"
-                        ? "alert-panel__indicator--red"
-                        : alert.risk === "AMARILLO"
-                          ? "alert-panel__indicator--yellow"
-                          : "alert-panel__indicator--green"
-                    }`}
-                  />
+                  <div className={`alert-panel__indicator ${indicatorClass(alert.risk)}`} />
                   <div className="alert-panel__content">
-                    <div
-                      className={
-                        alert.risk === "ROJO"
-                          ? "alert-panel__type text-danger"
-                          : alert.risk === "AMARILLO"
-                            ? "alert-panel__type text-warning"
-                            : "alert-panel__type text-success"
-                      }
-                    >
+                    <div className={textClass(alert.risk)}>
                       {alert.title}
                     </div>
                     <div className="alert-panel__detail">

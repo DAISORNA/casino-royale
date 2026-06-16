@@ -1,23 +1,13 @@
 import {
-  Bell,
-  BriefcaseBusiness,
-  CircleAlert,
-  CircleDollarSign,
-  Clock3,
-  CreditCard,
-  FileWarning,
-  House,
-  LayoutDashboard,
-  LogOut,
-  ShieldAlert,
-  ShieldPlus,
-  UserRound
+  Bell, BriefcaseBusiness, CircleAlert, CircleDollarSign, Clock3, CreditCard,
+  FileWarning, House, LayoutDashboard, LogOut, ShieldAlert, ShieldPlus, UserRound
 } from "lucide-react";
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { NavLink, Outlet, useNavigate, useOutletContext } from "react-router-dom";
 import { getRoleBadge, getRoleHome, roleCapabilities } from "../app/roles";
 import { useAppStore } from "../app/store";
 import { BuyInModal, CashOutModal, ManualAlertModal, ReceiptModal } from "./TransactionModals";
+import type { Role } from "../app/types";
 
 type ModalType = "buyin" | "cashout" | "receipt" | "manual-alert" | null;
 
@@ -41,11 +31,11 @@ function useClock() {
   );
 
   useEffect(() => {
-    const interval = window.setInterval(() => {
+    const interval = globalThis.setInterval(() => {
       setTime(new Date().toLocaleTimeString("es-PA", { hour: "2-digit", minute: "2-digit" }));
     }, 1000);
 
-    return () => window.clearInterval(interval);
+    return () => globalThis.clearInterval(interval);
   }, []);
 
   return time;
@@ -77,28 +67,39 @@ function SidebarAction({
   );
 }
 
-function buildNavigation(role: NonNullable<ReturnType<typeof useAppStore.getState>["session"]>["role"]) {
+const homeLabels: Record<Role, string> = {
+  Dealer: "Mesa de juego",
+  Supervisor: "Monitoreo de sala",
+  Administrador: "Centro global",
+  Oficial: "Panel privado",
+  Cajero: "Inicio de caja"
+};
+
+const homeIcons: Record<Role, typeof ShieldAlert> = {
+  Oficial: ShieldAlert,
+  Cajero: CircleAlert,
+  Dealer: CircleAlert,
+  Supervisor: CircleAlert,
+  Administrador: CircleAlert
+};
+
+function buildBuyInLabel(role: Role): string {
+  return role === "Dealer" ? "Buy-in en mesa" : "Buy-in";
+}
+
+function buildNavigation(role: Role) {
   const capabilities = roleCapabilities[role];
 
   const operation: NavItem[] = [
     {
       to: getRoleHome(role),
-      label:
-        role === "Dealer"
-          ? "Mesa de juego"
-          : role === "Supervisor"
-            ? "Monitoreo de sala"
-            : role === "Administrador"
-              ? "Centro global"
-              : role === "Oficial"
-                ? "Panel privado"
-                : "Inicio de caja",
-      icon: role === "Oficial" ? ShieldAlert : CircleAlert
+      label: homeLabels[role],
+      icon: homeIcons[role]
     }
   ];
 
   if (capabilities.canBuyIn) {
-    operation.push({ label: role === "Dealer" ? "Buy-in en mesa" : "Buy-in", icon: CircleDollarSign, action: "buyin" });
+    operation.push({ label: buildBuyInLabel(role), icon: CircleDollarSign, action: "buyin" });
   }
   if (capabilities.canCashOut) {
     operation.push({ label: "Cash-out", icon: CreditCard, action: "cashout" });
@@ -138,7 +139,7 @@ export function AppShell() {
   const [activeModal, setActiveModal] = useState<ModalType>(null);
 
   useEffect(() => {
-    void hydrate();
+    hydrate();
   }, [hydrate]);
 
   useEffect(() => {
@@ -308,6 +309,7 @@ export function AppShell() {
 }
 
 export function useAppChrome() {
-  const context = useContext(AppChromeContext) ?? useOutletContext<AppChromeContextType>();
-  return context;
+  const chromeContext = useContext(AppChromeContext);
+  const outletContext = useOutletContext<AppChromeContextType | null>();
+  return chromeContext ?? outletContext;
 }

@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { roleCapabilities } from "../../app/roles";
 import { useAppStore } from "../../app/store";
-import type { AlertItem } from "../../app/types";
+
 import { RiskBadge } from "../../components/RiskBadge";
 
 const filters = ["Todas", "Criticas", "PEP", "Fraccionamiento", "Manuales"] as const;
@@ -124,7 +124,7 @@ export function AlertsPage() {
                 </div>
                 <button
                   className="button button-secondary"
-                  onClick={() => void resolveAlert(selectedAlert.id, closureJustification)}
+                  onClick={() => resolveAlert(selectedAlert.id, closureJustification)}
                   type="button"
                 >
                   Cerrar alerta con justificacion
@@ -142,7 +142,7 @@ export function AlertsPage() {
                   className="button button-primary"
                   disabled={!canCreateRos}
                   onClick={() =>
-                    void createRos(
+                    createRos(
                       selectedAlert.id,
                       narrative || `ROS confidencial basado en ${selectedAlert.type} y session precargada del cliente.`
                     )

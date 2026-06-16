@@ -1,12 +1,21 @@
 import type { RiskLevel } from "../app/types";
 
-export function RiskBadge({ risk }: { risk: RiskLevel }) {
-  const className =
-    risk === "VERDE" ? "badge badge-green" : risk === "AMARILLO" ? "badge badge-yellow" : "badge badge-red";
+const badgeClasses: Record<RiskLevel, string> = {
+  VERDE: "badge badge-green",
+  AMARILLO: "badge badge-yellow",
+  ROJO: "badge badge-red"
+};
 
+const dotClasses: Record<RiskLevel, string> = {
+  VERDE: "risk-dot risk-green",
+  AMARILLO: "risk-dot risk-yellow",
+  ROJO: "risk-dot risk-red"
+};
+
+export function RiskBadge({ risk }: { risk: RiskLevel }) {
   return (
-    <span className={className}>
-      <span className={`risk-dot ${risk === "VERDE" ? "risk-green" : risk === "AMARILLO" ? "risk-yellow" : "risk-red"}`} />
+    <span className={badgeClasses[risk]}>
+      <span className={dotClasses[risk]} />
       {risk}
     </span>
   );

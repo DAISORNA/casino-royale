@@ -24,8 +24,8 @@ function ModalShell({
   if (!isOpen) return null;
 
   return (
-    <div className="modal-overlay active" onClick={onClose}>
-      <div className="modal" style={{ maxWidth }} onClick={(event) => event.stopPropagation()}>
+    <div className="modal-overlay active" onClick={onClose} onKeyDown={(event) => { if (event.key === "Escape") onClose(); }} role="dialog" aria-modal="true">
+      <div className="modal" style={{ maxWidth }} onClick={(event) => event.stopPropagation()} onKeyDown={(event) => event.stopPropagation()}>
         <div className="modal__header">
           <h2 className="modal__title text-gold">{title}</h2>
           <button className="modal__close" onClick={onClose} type="button">
@@ -310,7 +310,7 @@ export function BuyInModal({
 
 export function CashOutModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
   const submitTransaction = useAppStore((state) => state.submitTransaction);
-  const [amount, setAmount] = useState(3000);
+  const [amount] = useState(3000);
   const [documentNumber, setDocumentNumber] = useState("8-902-1547");
   const [name, setName] = useState("Luis Fernando Espinosa Quintero");
   const [nationality, setNationality] = useState("Panameña");

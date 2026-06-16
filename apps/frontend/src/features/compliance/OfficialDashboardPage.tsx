@@ -109,7 +109,7 @@ export function OfficialDashboardPage() {
                 </div>
                 <p className="muted mono">{item.clientHash}</p>
                 <p>{item.originOfFunds}</p>
-                <button className="button button-primary" onClick={() => void approveRte(item.id)} disabled={item.approvedByOfficer}>
+                <button className="button button-primary" onClick={() => approveRte(item.id)} disabled={item.approvedByOfficer}>
                   {item.approvedByOfficer ? "Aprobado" : "Aprobar RTE"}
                 </button>
               </div>

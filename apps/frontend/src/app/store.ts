@@ -135,8 +135,28 @@ function detectRisk(client: string, amount: number, residenceCountry?: string): 
   };
 }
 
+const riskWeights: Record<RiskLevel, number> = {
+  ROJO: 100,
+  AMARILLO: 65,
+  VERDE: 18
+};
+
 function riskWeight(level: RiskLevel) {
-  return level === "ROJO" ? 100 : level === "AMARILLO" ? 65 : 18;
+  return riskWeights[level];
+}
+
+function computeTransactionStatus(level: RiskLevel, requiresRte: boolean): Transaction["status"] {
+  if (level === "ROJO") return "BLOQUEADA";
+  if (requiresRte) return "PENDIENTE_RTE";
+  if (level === "AMARILLO") return "PENDIENTE_REVISION";
+  return "COMPLETADA";
+}
+
+function buildScreeningResultMessage(level: RiskLevel, requiresRte: boolean): string {
+  if (level === "ROJO") return "Transaccion bloqueada por screening AML.";
+  if (level === "AMARILLO") return "Transaccion retenida para revision AML/PEP.";
+  if (requiresRte) return "Operacion completada y enviada a flujo RTE.";
+  return "Operacion completada sin hallazgos.";
 }
 
 function makeAudit(actor: string, event: string, result: string): AuditEvent {
@@ -152,12 +172,12 @@ function makeAudit(actor: string, event: string, result: string): AuditEvent {
 const UI_PREFERENCES_KEY = "casinodesk.uiPreferences";
 
 function readUiPreferences(): UiPreferences {
-  if (typeof window === "undefined") {
+  if (typeof globalThis === "undefined" || typeof globalThis.window === "undefined") {
     return { themeMode: "light", accentColor: "#d4af37" };
   }
 
   try {
-    const raw = window.localStorage.getItem(UI_PREFERENCES_KEY);
+    const raw = globalThis.window.localStorage.getItem(UI_PREFERENCES_KEY);
     if (!raw) {
       return { themeMode: "light", accentColor: "#d4af37" };
     }
@@ -173,11 +193,8 @@ function readUiPreferences(): UiPreferences {
 }
 
 function persistUiPreferences(preferences: UiPreferences) {
-  if (typeof window === "undefined") {
-    return;
-  }
-
-  window.localStorage.setItem(UI_PREFERENCES_KEY, JSON.stringify(preferences));
+  if (typeof globalThis === "undefined" || typeof globalThis.window === "undefined") return;
+  globalThis.window.localStorage.setItem(UI_PREFERENCES_KEY, JSON.stringify(preferences));
 }
 
 export const useAppStore = create<AppState>((set, get) => ({
@@ -269,14 +286,7 @@ export const useAppStore = create<AppState>((set, get) => ({
     const requiresKyc = input.amount >= 2000;
     const requiresRte = input.paymentMethod === "EFECTIVO" && input.amount >= 10000;
     const actor = get().session?.fullName ?? "Sistema";
-    const status =
-      screening.level === "ROJO"
-        ? "BLOQUEADA"
-        : requiresRte
-          ? "PENDIENTE_RTE"
-          : screening.level === "AMARILLO"
-            ? "PENDIENTE_REVISION"
-            : "COMPLETADA";
+    const status = computeTransactionStatus(screening.level, requiresRte);
 
     const transaction: Transaction = {
       id: `txn-${Date.now()}`,
@@ -437,13 +447,7 @@ export const useAppStore = create<AppState>((set, get) => ({
         makeAudit(
           actor,
           `${input.type === "BUY_IN" ? "Buy-in" : "Cash-out"} registrado`,
-          screening.level === "ROJO"
-            ? "Transaccion bloqueada por screening AML."
-            : screening.level === "AMARILLO"
-              ? "Transaccion retenida para revision AML/PEP."
-              : requiresRte
-                ? "Operacion completada y enviada a flujo RTE."
-                : "Operacion completada sin hallazgos."
+          buildScreeningResultMessage(screening.level, requiresRte)
         ),
         ...get().audit
       ]

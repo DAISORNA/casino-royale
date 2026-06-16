@@ -57,8 +57,36 @@ type BackendScreening = {
   pepMatch?: string | null;
 };
 
+const riskLevelMap: Record<string, RiskLevel> = {
+  Verde: "VERDE",
+  Amarillo: "AMARILLO",
+  Rojo: "ROJO"
+};
+
 function toRiskLevel(value: "Verde" | "Amarillo" | "Rojo"): RiskLevel {
-  return value === "Verde" ? "VERDE" : value === "Amarillo" ? "AMARILLO" : "ROJO";
+  return riskLevelMap[value];
+}
+
+const paymentMethodMap: Record<string, Transaction["paymentMethod"]> = {
+  Efectivo: "EFECTIVO",
+  Tarjeta: "TARJETA",
+  Transferencia: "TRANSFERENCIA",
+  Cheque: "CHEQUE"
+};
+
+function mapPaymentMethod(value: string): Transaction["paymentMethod"] {
+  return paymentMethodMap[value] ?? "EFECTIVO";
+}
+
+const transactionStatusMap: Record<string, Transaction["status"]> = {
+  Completada: "COMPLETADA",
+  Bloqueada: "BLOQUEADA",
+  PendienteRte: "PENDIENTE_RTE",
+  PendienteRevision: "PENDIENTE_REVISION"
+};
+
+function mapTransactionStatus(value: string): Transaction["status"] {
+  return transactionStatusMap[value] ?? "COMPLETADA";
 }
 
 function toAlertType(value: BackendAlert["type"]): AlertType {
@@ -85,23 +113,9 @@ function mapTransaction(item: BackendTransaction): Transaction {
     clientDisplayName: item.clientName,
     clientHash: item.clientHash,
     amount: item.amount,
-    paymentMethod:
-      item.paymentMethod === "Efectivo"
-        ? "EFECTIVO"
-        : item.paymentMethod === "Tarjeta"
-          ? "TARJETA"
-          : item.paymentMethod === "Transferencia"
-            ? "TRANSFERENCIA"
-            : "CHEQUE",
+    paymentMethod: mapPaymentMethod(item.paymentMethod),
     risk: toRiskLevel(item.riskLevel),
-    status:
-      item.status === "PendienteRte"
-        ? "PENDIENTE_RTE"
-        : item.status === "PendienteRevision"
-          ? "PENDIENTE_REVISION"
-          : item.status === "Bloqueada"
-            ? "BLOQUEADA"
-            : "COMPLETADA",
+    status: mapTransactionStatus(item.status),
     createdAt: item.createdAt,
     chipsPlayedRatio: item.chipsPlayedRatio ?? undefined,
     requiresKyc: item.requiresKyc,
