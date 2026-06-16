@@ -24,8 +24,8 @@ function ModalShell({
   if (!isOpen) return null;
 
   return (
-    <div className="modal-overlay active" onClick={onClose} onKeyDown={(event) => { if (event.key === "Escape") onClose(); }} role="dialog" aria-modal="true">
-      <div className="modal" style={{ maxWidth }} onClick={(event) => event.stopPropagation()} onKeyDown={(event) => event.stopPropagation()}>
+    <dialog className="modal-overlay active" onClick={onClose}>
+      <div className="modal" style={{ maxWidth }} onClick={(event) => event.stopPropagation()}>
         <div className="modal__header">
           <h2 className="modal__title text-gold">{title}</h2>
           <button className="modal__close" onClick={onClose} type="button">
@@ -34,6 +34,285 @@ function ModalShell({
         </div>
         <div className="modal__body">{children}</div>
         {footer ? <div className="modal__footer">{footer}</div> : null}
+      </div>
+    </dialog>
+  );
+}
+
+interface BuyInFormState {
+  step: number;
+  amount: number;
+  paymentMethod: "EFECTIVO" | "TARJETA" | "TRANSFERENCIA" | "CHEQUE";
+  documentNumber: string;
+  name: string;
+  nationality: string;
+  residenceCountry: string;
+  originOfFunds: string;
+  captureMode: "QR" | "MANUAL";
+  proportionality: "PROPORCIONAL" | "NO_PROPORCIONAL";
+  riskLevel: "VERDE" | "AMARILLO" | "ROJO";
+}
+
+const INITIAL_STATE: BuyInFormState = {
+  step: 1,
+  amount: 2500,
+  paymentMethod: "EFECTIVO",
+  documentNumber: "8-712-2241",
+  name: "Carlos Andres Nunez Pinilla",
+  nationality: "Panameña",
+  residenceCountry: "Panamá",
+  originOfFunds: "Actividad comercial y disponibilidad de fondos declarada.",
+  captureMode: "QR",
+  proportionality: "PROPORCIONAL",
+  riskLevel: "VERDE"
+};
+
+function useBuyInForm() {
+  const [step, setStep] = useState(INITIAL_STATE.step);
+  const [amount, setAmount] = useState(INITIAL_STATE.amount);
+  const [paymentMethod, setPaymentMethod] = useState(INITIAL_STATE.paymentMethod);
+  const [documentNumber, setDocumentNumber] = useState(INITIAL_STATE.documentNumber);
+  const [name, setName] = useState(INITIAL_STATE.name);
+  const [nationality, setNationality] = useState(INITIAL_STATE.nationality);
+  const [residenceCountry, setResidenceCountry] = useState(INITIAL_STATE.residenceCountry);
+  const [originOfFunds, setOriginOfFunds] = useState(INITIAL_STATE.originOfFunds);
+  const [captureMode, setCaptureMode] = useState(INITIAL_STATE.captureMode);
+  const [proportionality, setProportionality] = useState(INITIAL_STATE.proportionality);
+  const [riskLevel, setRiskLevel] = useState(INITIAL_STATE.riskLevel);
+
+  const reset = () => {
+    setStep(INITIAL_STATE.step);
+    setAmount(INITIAL_STATE.amount);
+    setPaymentMethod(INITIAL_STATE.paymentMethod);
+    setDocumentNumber(INITIAL_STATE.documentNumber);
+    setName(INITIAL_STATE.name);
+    setNationality(INITIAL_STATE.nationality);
+    setResidenceCountry(INITIAL_STATE.residenceCountry);
+    setOriginOfFunds(INITIAL_STATE.originOfFunds);
+    setCaptureMode(INITIAL_STATE.captureMode);
+    setProportionality(INITIAL_STATE.proportionality);
+    setRiskLevel(INITIAL_STATE.riskLevel);
+  };
+
+  return {
+    step, setStep,
+    amount, setAmount,
+    paymentMethod, setPaymentMethod,
+    documentNumber, setDocumentNumber,
+    name, setName,
+    nationality, setNationality,
+    residenceCountry, setResidenceCountry,
+    originOfFunds, setOriginOfFunds,
+    captureMode, setCaptureMode,
+    proportionality, setProportionality,
+    riskLevel, setRiskLevel,
+    reset
+  };
+}
+
+function Step1Content({
+  amount, setAmount,
+  paymentMethod, setPaymentMethod,
+  captureMode, setCaptureMode,
+  requiresKyc
+}: {
+  readonly amount: number;
+  readonly setAmount: (v: number) => void;
+  readonly paymentMethod: string;
+  readonly setPaymentMethod: (v: "EFECTIVO" | "TARJETA" | "TRANSFERENCIA" | "CHEQUE") => void;
+  readonly captureMode: "QR" | "MANUAL";
+  readonly setCaptureMode: (v: "QR" | "MANUAL") => void;
+  readonly requiresKyc: boolean;
+}) {
+  return (
+    <div>
+      <h4 className="modal__section-title">1. Umbral y canal operativo</h4>
+
+      <div className="grid grid--2col mb-lg">
+        <div className="form-group">
+          <label className="form-label" htmlFor="bi-amount">MONTO DE LA TRANSACCIÓN</label>
+          <input className="form-input form-input--large" id="bi-amount" type="number" value={amount} onChange={(event) => setAmount(Number(event.target.value))} />
+        </div>
+        <div className="form-group">
+          <label className="form-label" htmlFor="bi-capture">CAPTURA DEL DOCUMENTO</label>
+          <div className="radio-group">
+            {(["QR", "MANUAL"] as const).map((mode) => (
+              <label className="radio-option" key={mode}>
+                <input checked={captureMode === mode} name="capture-mode" onChange={() => setCaptureMode(mode)} type="radio" />
+                <span className="radio-option__label">{mode === "QR" ? "Escaneo QR" : "Entrada manual"}</span>
+              </label>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div className="form-group">
+        <label className="form-label" htmlFor="bi-payment">INSTRUMENTO DE PAGO</label>
+        <div className="radio-group">
+          {(["EFECTIVO", "TARJETA", "TRANSFERENCIA", "CHEQUE"] as const).map((method) => (
+            <label className="radio-option" key={method}>
+              <input checked={paymentMethod === method} name="buyin-method" onChange={() => setPaymentMethod(method)} type="radio" />
+              <span className="radio-option__label">{method}</span>
+            </label>
+          ))}
+        </div>
+      </div>
+
+      {requiresKyc ? (
+        <div className="kyc-warning">
+          <strong className="text-gold">KYC ACTIVADO</strong>
+          <p>Art. 27 Ley 23/2015 · Documento, nacionalidad, residencia y screening AML/PEP.</p>
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
+function Step2Content({
+  documentNumber, setDocumentNumber,
+  nationality, setNationality,
+  name, setName,
+  residenceCountry, setResidenceCountry,
+  proportionality, setProportionality,
+  computedRisk,
+  requiresRte,
+  originOfFunds, setOriginOfFunds
+}: {
+  readonly documentNumber: string; readonly setDocumentNumber: (v: string) => void;
+  readonly nationality: string; readonly setNationality: (v: string) => void;
+  readonly name: string; readonly setName: (v: string) => void;
+  readonly residenceCountry: string; readonly setResidenceCountry: (v: string) => void;
+  readonly proportionality: string; readonly setProportionality: (v: "PROPORCIONAL" | "NO_PROPORCIONAL") => void;
+  readonly computedRisk: string;
+  readonly requiresRte: boolean;
+  readonly originOfFunds: string; readonly setOriginOfFunds: (v: string) => void;
+}) {
+  return (
+    <div>
+      <h4 className="modal__section-title">2. Identificación del cliente</h4>
+      <p className="form-hint">QR preferido. Si no es legible, se admite ingreso manual conforme al criterio del PDF.</p>
+
+      <div className="grid grid--2col mb-lg">
+        <div className="form-group">
+          <label className="form-label" htmlFor="bi-doc">CÉDULA / PASAPORTE</label>
+          <input className="form-input" id="bi-doc" value={documentNumber} onChange={(event) => setDocumentNumber(event.target.value)} />
+        </div>
+        <div className="form-group">
+          <label className="form-label" htmlFor="bi-nat">NACIONALIDAD</label>
+          <input className="form-input" id="bi-nat" value={nationality} onChange={(event) => setNationality(event.target.value)} />
+        </div>
+      </div>
+
+      <div className="grid grid--2col mb-lg">
+        <div className="form-group">
+          <label className="form-label" htmlFor="bi-name">NOMBRE COMPLETO</label>
+          <input className="form-input" id="bi-name" value={name} onChange={(event) => setName(event.target.value)} />
+        </div>
+        <div className="form-group">
+          <label className="form-label" htmlFor="bi-res">PAÍS DE RESIDENCIA</label>
+          <input className="form-input" id="bi-res" value={residenceCountry} onChange={(event) => setResidenceCountry(event.target.value)} />
+        </div>
+      </div>
+
+      {computedRisk === "AMARILLO" ? (
+        <div className="form-group">
+          <label className="form-label" htmlFor="bi-prop">PROPORCIONALIDAD PEP / PERFIL ECONÓMICO</label>
+          <div className="radio-group">
+            {(["PROPORCIONAL", "NO_PROPORCIONAL"] as const).map((value) => (
+              <label className="radio-option" key={value}>
+                <input checked={proportionality === value} name="proportionality" onChange={() => setProportionality(value)} type="radio" />
+                <span className="radio-option__label">{value === "PROPORCIONAL" ? "Proporcional" : "No proporcional"}</span>
+              </label>
+            ))}
+          </div>
+        </div>
+      ) : null}
+
+      {requiresRte || proportionality === "NO_PROPORCIONAL" ? (
+        <div className="form-group">
+          <label className="form-label" htmlFor="bi-funds">ORIGEN DE FONDOS / JUSTIFICACIÓN</label>
+          <textarea className="form-input form-textarea" id="bi-funds" value={originOfFunds} onChange={(event) => setOriginOfFunds(event.target.value)} />
+        </div>
+      ) : null}
+
+      <div className="screening-result">
+        <h5>Screening AML/PEP</h5>
+        <div className="screening-badges">
+          <span className="badge badge--green">OFAC</span>
+          <span className="badge badge--green">ONU</span>
+          <span className="badge badge--green">UE</span>
+          <span className="badge badge--green">PEP</span>
+        </div>
+        <div className="screening-summary">
+          <RiskBadge risk={computedRisk as "VERDE" | "AMARILLO" | "ROJO"} />
+          <p className="text-secondary">
+            {computedRisk === "VERDE" && "Sin coincidencias. Puede avanzar."}
+            {computedRisk === "AMARILLO" && "Caso PEP o riesgo geográfico. Requiere evaluación privada."}
+            {computedRisk === "ROJO" && "Coincidencia AML. La transacción quedará bloqueada."}
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Step3Content({
+  session,
+  amount,
+  captureMode,
+  name,
+  residenceCountry,
+  riskLevel,
+  requiresRte,
+  proportionality
+}: {
+  readonly session: { readonly role?: string } | null;
+  readonly amount: number;
+  readonly captureMode: string;
+  readonly name: string;
+  readonly residenceCountry: string;
+  readonly riskLevel: string;
+  readonly requiresRte: boolean;
+  readonly proportionality: string;
+}) {
+  return (
+    <div>
+      <h4 className="modal__section-title">3. Expediente y semáforo</h4>
+      <div className="receipt">
+        <div className="receipt__header">
+          <div className="receipt__title text-gold">EXPEDIENTE DE BUY-IN</div>
+          <div className="receipt__id">TX-{new Date().getFullYear()}-{Date.now().toString().slice(-5)}</div>
+        </div>
+        <div className="receipt__row">
+          <span>Canal</span>
+          <span>{session?.role === "Dealer" ? "Mesa" : "Caja"}</span>
+        </div>
+        <div className="receipt__row">
+          <span>Monto</span>
+          <span className="text-gold">{formatCurrency(amount)}</span>
+        </div>
+        <div className="receipt__row">
+          <span>Documento</span>
+          <span>{captureMode === "QR" ? "Escaneo QR" : "Entrada manual"}</span>
+        </div>
+        <div className="receipt__row">
+          <span>Cliente</span>
+          <span>{name}</span>
+        </div>
+        <div className="receipt__row">
+          <span>Residencia</span>
+          <span>{residenceCountry}</span>
+        </div>
+        <div className="modal-risk-line">
+          <RiskBadge risk={riskLevel as "VERDE" | "AMARILLO" | "ROJO"} />
+          {requiresRte ? <span className="badge badge--yellow">RTE requerido</span> : null}
+          {proportionality === "NO_PROPORCIONAL" ? <span className="badge badge--yellow">Escalar PEP</span> : null}
+        </div>
+      </div>
+
+      <div className="trace-panel">
+        <strong>Trazabilidad</strong>
+        <p>Hash+salt para documento, expediente inmutable y retención mínima de 5 años.</p>
       </div>
     </div>
   );
@@ -50,41 +329,48 @@ export function BuyInModal({
 }) {
   const submitTransaction = useAppStore((state) => state.submitTransaction);
   const session = useAppStore((state) => state.session);
-  const [step, setStep] = useState(1);
-  const [amount, setAmount] = useState(2500);
-  const [paymentMethod, setPaymentMethod] = useState<"EFECTIVO" | "TARJETA" | "TRANSFERENCIA" | "CHEQUE">("EFECTIVO");
-  const [documentNumber, setDocumentNumber] = useState("8-712-2241");
-  const [name, setName] = useState("Carlos Andres Nunez Pinilla");
-  const [nationality, setNationality] = useState("Panameña");
-  const [residenceCountry, setResidenceCountry] = useState("Panamá");
-  const [originOfFunds, setOriginOfFunds] = useState("Actividad comercial y disponibilidad de fondos declarada.");
-  const [captureMode, setCaptureMode] = useState<"QR" | "MANUAL">("QR");
-  const [proportionality, setProportionality] = useState<"PROPORCIONAL" | "NO_PROPORCIONAL">("PROPORCIONAL");
-  const [riskLevel, setRiskLevel] = useState<"VERDE" | "AMARILLO" | "ROJO">("VERDE");
+  const form = useBuyInForm();
 
-  const requiresKyc = amount >= 2000;
-  const requiresRte = amount >= 10000 && paymentMethod === "EFECTIVO";
+  const requiresKyc = form.amount >= 2000;
+  const requiresRte = form.amount >= 10000 && form.paymentMethod === "EFECTIVO";
 
   const computedRisk = useMemo(() => {
-    const upper = name.toUpperCase();
-    const country = residenceCountry.toUpperCase();
+    const upper = form.name.toUpperCase();
+    const country = form.residenceCountry.toUpperCase();
     if (upper.includes("OFAC") || upper.includes("SANCIONADO")) return "ROJO" as const;
-    if (upper.includes("PEP") || upper.includes("ALCALDE") || amount >= 8000 || country.includes("RIESGO")) return "AMARILLO" as const;
+    if (upper.includes("PEP") || upper.includes("ALCALDE") || form.amount >= 8000 || country.includes("RIESGO")) return "AMARILLO" as const;
     return "VERDE" as const;
-  }, [amount, name, residenceCountry]);
+  }, [form.amount, form.name, form.residenceCountry]);
 
-  const reset = () => {
-    setStep(1);
-    setAmount(2500);
-    setPaymentMethod("EFECTIVO");
-    setDocumentNumber("8-712-2241");
-    setName("Carlos Andres Nunez Pinilla");
-    setNationality("Panameña");
-    setResidenceCountry("Panamá");
-    setOriginOfFunds("Actividad comercial y disponibilidad de fondos declarada.");
-    setCaptureMode("QR");
-    setProportionality("PROPORCIONAL");
-    setRiskLevel("VERDE");
+  const handleSubmit = async () => {
+    if (form.step === 1) {
+      form.setStep(requiresKyc ? 2 : 3);
+      return;
+    }
+
+    if (form.step === 2) {
+      form.setRiskLevel(computedRisk);
+      form.setStep(3);
+      return;
+    }
+
+    const result = await submitTransaction({
+      type: "BUY_IN",
+      clientDisplayName: form.name,
+      documentNumber: form.documentNumber,
+      amount: form.amount,
+      paymentMethod: form.paymentMethod,
+      originOfFunds: requiresRte || form.proportionality === "NO_PROPORCIONAL" ? form.originOfFunds : undefined,
+      justification: form.proportionality === "NO_PROPORCIONAL" ? form.originOfFunds : undefined,
+      nationality: form.nationality,
+      residenceCountry: form.residenceCountry,
+      sourceChannel: session?.role === "Dealer" ? "MESA" : "CAJA",
+      documentCaptureMode: form.captureMode
+    });
+    form.setRiskLevel(result.level);
+    onClose();
+    form.reset();
+    onSuccess();
   };
 
   return (
@@ -92,7 +378,7 @@ export function BuyInModal({
       isOpen={isOpen}
       onClose={() => {
         onClose();
-        reset();
+        form.reset();
       }}
       title={session?.role === "Dealer" ? "Buy-in — Mesa de juego" : "Buy-in — Compra de fichas"}
       maxWidth={760}
@@ -100,8 +386,8 @@ export function BuyInModal({
         <>
           <button
             className="btn btn--secondary"
-            onClick={() => setStep((current) => Math.max(1, current - 1))}
-            style={{ visibility: step === 1 ? "hidden" : "visible" }}
+            onClick={() => form.setStep((current: number) => Math.max(1, current - 1))}
+            style={{ visibility: form.step === 1 ? "hidden" : "visible" }}
             type="button"
           >
             Volver
@@ -109,41 +395,8 @@ export function BuyInModal({
           <button className="btn btn--ghost" onClick={onClose} type="button">
             Pausar y atender siguiente
           </button>
-          <button
-            className="btn btn--primary"
-            onClick={async () => {
-              if (step === 1) {
-                setStep(requiresKyc ? 2 : 3);
-                return;
-              }
-
-              if (step === 2) {
-                setRiskLevel(computedRisk);
-                setStep(3);
-                return;
-              }
-
-              const result = await submitTransaction({
-                type: "BUY_IN",
-                clientDisplayName: name,
-                documentNumber,
-                amount,
-                paymentMethod,
-                originOfFunds: requiresRte || proportionality === "NO_PROPORCIONAL" ? originOfFunds : undefined,
-                justification: proportionality === "NO_PROPORCIONAL" ? originOfFunds : undefined,
-                nationality,
-                residenceCountry,
-                sourceChannel: session?.role === "Dealer" ? "MESA" : "CAJA",
-                documentCaptureMode: captureMode
-              });
-              setRiskLevel(result.level);
-              onClose();
-              reset();
-              onSuccess();
-            }}
-            type="button"
-          >
-            {step === 3 ? "Registrar expediente" : "Continuar"}
+          <button className="btn btn--primary" onClick={handleSubmit} type="button">
+            {form.step === 3 ? "Registrar expediente" : "Continuar"}
           </button>
         </>
       }
@@ -152,157 +405,39 @@ export function BuyInModal({
         Menor a <strong>$2,000</strong>: sin KYC. Igual o mayor: escaneo de documento, screening AML/PEP y control de trazabilidad.
       </p>
 
-      {step === 1 ? (
-        <div>
-          <h4 className="modal__section-title">1. Umbral y canal operativo</h4>
-
-          <div className="grid grid--2col mb-lg">
-            <div className="form-group">
-              <label className="form-label" htmlFor="bi-amount">MONTO DE LA TRANSACCIÓN</label>
-              <input className="form-input form-input--large" id="bi-amount" type="number" value={amount} onChange={(event) => setAmount(Number(event.target.value))} />
-            </div>
-            <div className="form-group">
-              <label className="form-label" htmlFor="bi-capture">CAPTURA DEL DOCUMENTO</label>
-              <div className="radio-group">
-                {(["QR", "MANUAL"] as const).map((mode) => (
-                  <label className="radio-option" key={mode}>
-                    <input checked={captureMode === mode} name="capture-mode" onChange={() => setCaptureMode(mode)} type="radio" />
-                    <span className="radio-option__label">{mode === "QR" ? "Escaneo QR" : "Entrada manual"}</span>
-                  </label>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          <div className="form-group">
-            <label className="form-label" htmlFor="bi-payment">INSTRUMENTO DE PAGO</label>
-            <div className="radio-group">
-              {(["EFECTIVO", "TARJETA", "TRANSFERENCIA", "CHEQUE"] as const).map((method) => (
-                <label className="radio-option" key={method}>
-                  <input checked={paymentMethod === method} name="buyin-method" onChange={() => setPaymentMethod(method)} type="radio" />
-                  <span className="radio-option__label">{method}</span>
-                </label>
-              ))}
-            </div>
-          </div>
-
-          {requiresKyc ? (
-            <div className="kyc-warning">
-              <strong className="text-gold">KYC ACTIVADO</strong>
-              <p>Art. 27 Ley 23/2015 · Documento, nacionalidad, residencia y screening AML/PEP.</p>
-            </div>
-          ) : null}
-        </div>
+      {form.step === 1 ? (
+        <Step1Content
+          amount={form.amount} setAmount={form.setAmount}
+          paymentMethod={form.paymentMethod} setPaymentMethod={form.setPaymentMethod}
+          captureMode={form.captureMode} setCaptureMode={form.setCaptureMode}
+          requiresKyc={requiresKyc}
+        />
       ) : null}
 
-      {step === 2 ? (
-        <div>
-          <h4 className="modal__section-title">2. Identificación del cliente</h4>
-          <p className="form-hint">QR preferido. Si no es legible, se admite ingreso manual conforme al criterio del PDF.</p>
-
-          <div className="grid grid--2col mb-lg">
-            <div className="form-group">
-              <label className="form-label" htmlFor="bi-doc">CÉDULA / PASAPORTE</label>
-              <input className="form-input" id="bi-doc" value={documentNumber} onChange={(event) => setDocumentNumber(event.target.value)} />
-            </div>
-            <div className="form-group">
-              <label className="form-label" htmlFor="bi-nat">NACIONALIDAD</label>
-              <input className="form-input" id="bi-nat" value={nationality} onChange={(event) => setNationality(event.target.value)} />
-            </div>
-          </div>
-
-          <div className="grid grid--2col mb-lg">
-            <div className="form-group">
-              <label className="form-label" htmlFor="bi-name">NOMBRE COMPLETO</label>
-              <input className="form-input" id="bi-name" value={name} onChange={(event) => setName(event.target.value)} />
-            </div>
-            <div className="form-group">
-              <label className="form-label" htmlFor="bi-res">PAÍS DE RESIDENCIA</label>
-              <input className="form-input" id="bi-res" value={residenceCountry} onChange={(event) => setResidenceCountry(event.target.value)} />
-            </div>
-          </div>
-
-          {computedRisk === "AMARILLO" ? (
-            <div className="form-group">
-              <label className="form-label" htmlFor="bi-prop">PROPORCIONALIDAD PEP / PERFIL ECONÓMICO</label>
-              <div className="radio-group">
-                {(["PROPORCIONAL", "NO_PROPORCIONAL"] as const).map((value) => (
-                  <label className="radio-option" key={value}>
-                    <input checked={proportionality === value} name="proportionality" onChange={() => setProportionality(value)} type="radio" />
-                    <span className="radio-option__label">{value === "PROPORCIONAL" ? "Proporcional" : "No proporcional"}</span>
-                  </label>
-                ))}
-              </div>
-            </div>
-          ) : null}
-
-          {requiresRte || proportionality === "NO_PROPORCIONAL" ? (
-            <div className="form-group">
-              <label className="form-label" htmlFor="bi-funds">ORIGEN DE FONDOS / JUSTIFICACIÓN</label>
-              <textarea className="form-input form-textarea" id="bi-funds" value={originOfFunds} onChange={(event) => setOriginOfFunds(event.target.value)} />
-            </div>
-          ) : null}
-
-          <div className="screening-result">
-            <h5>Screening AML/PEP</h5>
-            <div className="screening-badges">
-              <span className="badge badge--green">OFAC</span>
-              <span className="badge badge--green">ONU</span>
-              <span className="badge badge--green">UE</span>
-              <span className="badge badge--green">PEP</span>
-            </div>
-            <div className="screening-summary">
-              <RiskBadge risk={computedRisk} />
-              <p className="text-secondary">
-                {computedRisk === "VERDE" && "Sin coincidencias. Puede avanzar."}
-                {computedRisk === "AMARILLO" && "Caso PEP o riesgo geográfico. Requiere evaluación privada."}
-                {computedRisk === "ROJO" && "Coincidencia AML. La transacción quedará bloqueada."}
-              </p>
-            </div>
-          </div>
-        </div>
+      {form.step === 2 ? (
+        <Step2Content
+          documentNumber={form.documentNumber} setDocumentNumber={form.setDocumentNumber}
+          nationality={form.nationality} setNationality={form.setNationality}
+          name={form.name} setName={form.setName}
+          residenceCountry={form.residenceCountry} setResidenceCountry={form.setResidenceCountry}
+          proportionality={form.proportionality} setProportionality={form.setProportionality}
+          computedRisk={computedRisk}
+          requiresRte={requiresRte}
+          originOfFunds={form.originOfFunds} setOriginOfFunds={form.setOriginOfFunds}
+        />
       ) : null}
 
-      {step === 3 ? (
-        <div>
-          <h4 className="modal__section-title">3. Expediente y semáforo</h4>
-          <div className="receipt">
-            <div className="receipt__header">
-              <div className="receipt__title text-gold">EXPEDIENTE DE BUY-IN</div>
-              <div className="receipt__id">TX-{new Date().getFullYear()}-{Date.now().toString().slice(-5)}</div>
-            </div>
-            <div className="receipt__row">
-              <span>Canal</span>
-              <span>{session?.role === "Dealer" ? "Mesa" : "Caja"}</span>
-            </div>
-            <div className="receipt__row">
-              <span>Monto</span>
-              <span className="text-gold">{formatCurrency(amount)}</span>
-            </div>
-            <div className="receipt__row">
-              <span>Documento</span>
-              <span>{captureMode === "QR" ? "Escaneo QR" : "Entrada manual"}</span>
-            </div>
-            <div className="receipt__row">
-              <span>Cliente</span>
-              <span>{name}</span>
-            </div>
-            <div className="receipt__row">
-              <span>Residencia</span>
-              <span>{residenceCountry}</span>
-            </div>
-            <div className="modal-risk-line">
-              <RiskBadge risk={riskLevel} />
-              {requiresRte ? <span className="badge badge--yellow">RTE requerido</span> : null}
-              {proportionality === "NO_PROPORCIONAL" ? <span className="badge badge--yellow">Escalar PEP</span> : null}
-            </div>
-          </div>
-
-          <div className="trace-panel">
-            <strong>Trazabilidad</strong>
-            <p>Hash+salt para documento, expediente inmutable y retención mínima de 5 años.</p>
-          </div>
-        </div>
+      {form.step === 3 ? (
+        <Step3Content
+          session={session}
+          amount={form.amount}
+          captureMode={form.captureMode}
+          name={form.name}
+          residenceCountry={form.residenceCountry}
+          riskLevel={form.riskLevel}
+          requiresRte={requiresRte}
+          proportionality={form.proportionality}
+        />
       ) : null}
     </ModalShell>
   );
