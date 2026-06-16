@@ -119,8 +119,8 @@ export function AlertsPage() {
                 </article>
 
                 <div className="field">
-                  <label>Justificacion de cierre sin ROS</label>
-                  <textarea value={closureJustification} onChange={(event) => setClosureJustification(event.target.value)} />
+                  <label htmlFor="alert-justification">Justificacion de cierre sin ROS</label>
+                  <textarea id="alert-justification" value={closureJustification} onChange={(event) => setClosureJustification(event.target.value)} />
                 </div>
                 <button
                   className="button button-secondary"
@@ -131,8 +131,9 @@ export function AlertsPage() {
                 </button>
 
                 <div className="field">
-                  <label>Narrativa ROS</label>
+                  <label htmlFor="alert-narrative">Narrativa ROS</label>
                   <textarea
+                    id="alert-narrative"
                     value={narrative}
                     onChange={(event) => setNarrative(event.target.value)}
                     placeholder="Describe el patron detectado, el origen del riesgo y el criterio de reporte."

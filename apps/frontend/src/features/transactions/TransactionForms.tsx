@@ -88,27 +88,27 @@ export function BuyInForm() {
         className="section-stack"
         style={{ marginTop: 18 }}
         onSubmit={form.handleSubmit(async (values) => {
-          const screening = await submitTransaction({ ...values, type: "BUY_IN" });
+          const screening = await submitTransaction({ ...values,                           type: "BUY_IN" });
           setResult(screening);
           form.reset(baseDefaults());
         })}
       >
         <div className="field-grid">
           <div className="field">
-            <label>Nombre del cliente</label>
-            <input {...form.register("clientDisplayName")} placeholder="Nombre completo" />
+            <label htmlFor="tf-client-name">Nombre del cliente</label>
+            <input id="tf-client-name" {...form.register("clientDisplayName")} placeholder="Nombre completo" />
           </div>
           <div className="field">
-            <label>Documento</label>
-            <input {...form.register("documentNumber")} placeholder="Cedula o pasaporte" />
+            <label htmlFor="tf-document">Documento</label>
+            <input id="tf-document" {...form.register("documentNumber")} placeholder="Cedula o pasaporte" />
           </div>
           <div className="field">
-            <label>Monto</label>
-            <input type="number" min="0" step="100" {...form.register("amount")} />
+            <label htmlFor="tf-amount">Monto</label>
+            <input id="tf-amount" type="number" min="0" step="100" {...form.register("amount")} />
           </div>
           <div className="field">
-            <label>Instrumento de pago</label>
-            <select {...form.register("paymentMethod")}>
+            <label htmlFor="tf-payment">Instrumento de pago</label>
+            <select id="tf-payment" {...form.register("paymentMethod")}>
               <option value="EFECTIVO">Efectivo</option>
               <option value="TARJETA">Tarjeta</option>
               <option value="TRANSFERENCIA">Transferencia</option>
@@ -120,12 +120,12 @@ export function BuyInForm() {
         {amount >= 2000 ? (
           <div className="field-grid">
             <div className="field">
-              <label>Origen de fondos</label>
-              <textarea {...form.register("originOfFunds")} placeholder="Declaracion requerida para revision reforzada o RTE." />
+              <label htmlFor="tf-funds">Origen de fondos</label>
+              <textarea id="tf-funds" {...form.register("originOfFunds")} placeholder="Declaracion requerida para revision reforzada o RTE." />
             </div>
             <div className="field">
-              <label>Justificacion PEP</label>
-              <textarea {...form.register("justification")} placeholder="Solo cuando el caso AMARILLO requiere proporcionalidad." />
+              <label htmlFor="tf-pep">Justificacion PEP</label>
+              <textarea id="tf-pep" {...form.register("justification")} placeholder="Solo cuando el caso AMARILLO requiere proporcionalidad." />
             </div>
           </div>
         ) : null}
@@ -167,27 +167,27 @@ export function CashOutForm() {
         className="section-stack"
         style={{ marginTop: 18 }}
         onSubmit={form.handleSubmit(async (values) => {
-          const screening = await submitTransaction({ ...values, type: "CASH_OUT" });
+          const screening = await submitTransaction({ ...values,                           type: "CASH_OUT" });
           setResult(screening);
           form.reset(baseDefaults());
         })}
       >
         <div className="field-grid">
           <div className="field">
-            <label>Nombre del cliente</label>
-            <input {...form.register("clientDisplayName")} placeholder="Nombre completo" />
+            <label htmlFor="tf-co-name">Nombre del cliente</label>
+            <input id="tf-co-name" {...form.register("clientDisplayName")} placeholder="Nombre completo" />
           </div>
           <div className="field">
-            <label>Documento</label>
-            <input {...form.register("documentNumber")} placeholder="Cedula o pasaporte" />
+            <label htmlFor="tf-co-doc">Documento</label>
+            <input id="tf-co-doc" {...form.register("documentNumber")} placeholder="Cedula o pasaporte" />
           </div>
           <div className="field">
-            <label>Monto de canje</label>
-            <input type="number" min="0" step="100" {...form.register("amount")} />
+            <label htmlFor="tf-co-amount">Monto de canje</label>
+            <input id="tf-co-amount" type="number" min="0" step="100" {...form.register("amount")} />
           </div>
           <div className="field">
-            <label>Instrumento de pago</label>
-            <select {...form.register("paymentMethod")}>
+            <label htmlFor="tf-co-payment">Instrumento de pago</label>
+            <select id="tf-co-payment" {...form.register("paymentMethod")}>
               <option value="EFECTIVO">Efectivo</option>
               <option value="TRANSFERENCIA">Transferencia</option>
               <option value="CHEQUE">Cheque</option>
@@ -198,12 +198,13 @@ export function CashOutForm() {
 
         <div className="field-grid">
           <div className="field">
-            <label>Ratio fichas apostadas</label>
-            <input type="number" min="0" max="1" step="0.01" {...form.register("chipsPlayedRatio")} />
+            <label htmlFor="tf-co-ratio">Ratio fichas apostadas</label>
+            <input id="tf-co-ratio" type="number" min="0" max="1" step="0.01" {...form.register("chipsPlayedRatio")} />
           </div>
           <div className="field">
-            <label>Origen de fondos / soporte</label>
+            <label htmlFor="tf-co-funds">Origen de fondos / soporte</label>
             <textarea
+              id="tf-co-funds"
               {...form.register("originOfFunds")}
               placeholder="Declaracion obligatoria para acumulados de efectivo y casos reforzados."
             />

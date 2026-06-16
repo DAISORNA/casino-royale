@@ -78,7 +78,7 @@ export function ProfilePage() {
           </div>
           <div className="section-stack">
             <div className="field">
-              <label>Tema de la aplicación</label>
+              <label htmlFor="theme-appearance">Tema de la aplicación</label>
               <div className="theme-toggle">
                 <button
                   className={`chip ${uiPreferences.themeMode === "light" ? "chip--active" : ""}`}
@@ -98,7 +98,7 @@ export function ProfilePage() {
             </div>
 
             <div className="field">
-              <label>Color de acento</label>
+              <label htmlFor="accent-appearance">Color de acento</label>
               <div className="accent-presets">
                 {accentPresets.map((color) => (
                   <button

@@ -158,11 +158,11 @@ export function BuyInModal({
 
           <div className="grid grid--2col mb-lg">
             <div className="form-group">
-              <label className="form-label">MONTO DE LA TRANSACCIÓN</label>
-              <input className="form-input form-input--large" type="number" value={amount} onChange={(event) => setAmount(Number(event.target.value))} />
+              <label className="form-label" htmlFor="bi-amount">MONTO DE LA TRANSACCIÓN</label>
+              <input className="form-input form-input--large" id="bi-amount" type="number" value={amount} onChange={(event) => setAmount(Number(event.target.value))} />
             </div>
             <div className="form-group">
-              <label className="form-label">CAPTURA DEL DOCUMENTO</label>
+              <label className="form-label" htmlFor="bi-capture">CAPTURA DEL DOCUMENTO</label>
               <div className="radio-group">
                 {(["QR", "MANUAL"] as const).map((mode) => (
                   <label className="radio-option" key={mode}>
@@ -175,7 +175,7 @@ export function BuyInModal({
           </div>
 
           <div className="form-group">
-            <label className="form-label">INSTRUMENTO DE PAGO</label>
+            <label className="form-label" htmlFor="bi-payment">INSTRUMENTO DE PAGO</label>
             <div className="radio-group">
               {(["EFECTIVO", "TARJETA", "TRANSFERENCIA", "CHEQUE"] as const).map((method) => (
                 <label className="radio-option" key={method}>
@@ -202,29 +202,29 @@ export function BuyInModal({
 
           <div className="grid grid--2col mb-lg">
             <div className="form-group">
-              <label className="form-label">CÉDULA / PASAPORTE</label>
-              <input className="form-input" value={documentNumber} onChange={(event) => setDocumentNumber(event.target.value)} />
+              <label className="form-label" htmlFor="bi-doc">CÉDULA / PASAPORTE</label>
+              <input className="form-input" id="bi-doc" value={documentNumber} onChange={(event) => setDocumentNumber(event.target.value)} />
             </div>
             <div className="form-group">
-              <label className="form-label">NACIONALIDAD</label>
-              <input className="form-input" value={nationality} onChange={(event) => setNationality(event.target.value)} />
+              <label className="form-label" htmlFor="bi-nat">NACIONALIDAD</label>
+              <input className="form-input" id="bi-nat" value={nationality} onChange={(event) => setNationality(event.target.value)} />
             </div>
           </div>
 
           <div className="grid grid--2col mb-lg">
             <div className="form-group">
-              <label className="form-label">NOMBRE COMPLETO</label>
-              <input className="form-input" value={name} onChange={(event) => setName(event.target.value)} />
+              <label className="form-label" htmlFor="bi-name">NOMBRE COMPLETO</label>
+              <input className="form-input" id="bi-name" value={name} onChange={(event) => setName(event.target.value)} />
             </div>
             <div className="form-group">
-              <label className="form-label">PAÍS DE RESIDENCIA</label>
-              <input className="form-input" value={residenceCountry} onChange={(event) => setResidenceCountry(event.target.value)} />
+              <label className="form-label" htmlFor="bi-res">PAÍS DE RESIDENCIA</label>
+              <input className="form-input" id="bi-res" value={residenceCountry} onChange={(event) => setResidenceCountry(event.target.value)} />
             </div>
           </div>
 
           {computedRisk === "AMARILLO" ? (
             <div className="form-group">
-              <label className="form-label">PROPORCIONALIDAD PEP / PERFIL ECONÓMICO</label>
+              <label className="form-label" htmlFor="bi-prop">PROPORCIONALIDAD PEP / PERFIL ECONÓMICO</label>
               <div className="radio-group">
                 {(["PROPORCIONAL", "NO_PROPORCIONAL"] as const).map((value) => (
                   <label className="radio-option" key={value}>
@@ -238,8 +238,8 @@ export function BuyInModal({
 
           {requiresRte || proportionality === "NO_PROPORCIONAL" ? (
             <div className="form-group">
-              <label className="form-label">ORIGEN DE FONDOS / JUSTIFICACIÓN</label>
-              <textarea className="form-input form-textarea" value={originOfFunds} onChange={(event) => setOriginOfFunds(event.target.value)} />
+              <label className="form-label" htmlFor="bi-funds">ORIGEN DE FONDOS / JUSTIFICACIÓN</label>
+              <textarea className="form-input form-textarea" id="bi-funds" value={originOfFunds} onChange={(event) => setOriginOfFunds(event.target.value)} />
             </div>
           ) : null}
 
@@ -360,8 +360,8 @@ export function CashOutModal({ isOpen, onClose }: { readonly isOpen: boolean; re
       </p>
 
       <div className="form-group">
-        <label className="form-label">TICKETS RECIBIDOS</label>
-        <ul className="ticket-list">
+        <label className="form-label" htmlFor="co-tickets">TICKETS RECIBIDOS</label>
+        <ul className="ticket-list" id="co-tickets">
           <li className="ticket-item">
             <span className="ticket-item__code">TKT-A47-2218</span>
             <span className="ticket-item__value">$1,800</span>
@@ -394,11 +394,11 @@ export function CashOutModal({ isOpen, onClose }: { readonly isOpen: boolean; re
 
       <div className="grid grid--2col mb-lg">
         <div className="form-group">
-          <label className="form-label">IDENTIFICACIÓN</label>
-          <input className="form-input" value={documentNumber} onChange={(event) => setDocumentNumber(event.target.value)} />
+          <label className="form-label" htmlFor="co-doc">IDENTIFICACIÓN</label>
+          <input className="form-input" id="co-doc" value={documentNumber} onChange={(event) => setDocumentNumber(event.target.value)} />
         </div>
         <div className="form-group">
-          <label className="form-label">CAPTURA</label>
+          <label className="form-label" htmlFor="co-capture">CAPTURA</label>
           <div className="radio-group">
             {(["QR", "MANUAL"] as const).map((mode) => (
               <label className="radio-option" key={mode}>
@@ -412,23 +412,23 @@ export function CashOutModal({ isOpen, onClose }: { readonly isOpen: boolean; re
 
       <div className="grid grid--2col mb-lg">
         <div className="form-group">
-          <label className="form-label">CLIENTE</label>
-          <input className="form-input" value={name} onChange={(event) => setName(event.target.value)} />
+          <label className="form-label" htmlFor="co-name">CLIENTE</label>
+          <input className="form-input" id="co-name" value={name} onChange={(event) => setName(event.target.value)} />
         </div>
         <div className="form-group">
-          <label className="form-label">RATIO FICHAS APOSTADAS</label>
-          <input className="form-input" max="1" min="0" step="0.01" type="number" value={chipsPlayedRatio} onChange={(event) => setChipsPlayedRatio(Number(event.target.value))} />
+          <label className="form-label" htmlFor="co-ratio">RATIO FICHAS APOSTADAS</label>
+          <input className="form-input" id="co-ratio" max="1" min="0" step="0.01" type="number" value={chipsPlayedRatio} onChange={(event) => setChipsPlayedRatio(Number(event.target.value))} />
         </div>
       </div>
 
       <div className="grid grid--2col mb-lg">
         <div className="form-group">
-          <label className="form-label">NACIONALIDAD</label>
-          <input className="form-input" value={nationality} onChange={(event) => setNationality(event.target.value)} />
+          <label className="form-label" htmlFor="co-nat">NACIONALIDAD</label>
+          <input className="form-input" id="co-nat" value={nationality} onChange={(event) => setNationality(event.target.value)} />
         </div>
         <div className="form-group">
-          <label className="form-label">PAÍS DE RESIDENCIA</label>
-          <input className="form-input" value={residenceCountry} onChange={(event) => setResidenceCountry(event.target.value)} />
+          <label className="form-label" htmlFor="co-res">PAÍS DE RESIDENCIA</label>
+          <input className="form-input" id="co-res" value={residenceCountry} onChange={(event) => setResidenceCountry(event.target.value)} />
         </div>
       </div>
 
@@ -484,22 +484,22 @@ export function ManualAlertModal({ isOpen, onClose }: { readonly isOpen: boolean
       </p>
 
       <div className="form-group">
-        <label className="form-label">MOTIVO</label>
-        <input className="form-input" value={title} onChange={(event) => setTitle(event.target.value)} />
+        <label className="form-label" htmlFor="ma-title">MOTIVO</label>
+        <input className="form-input" id="ma-title" value={title} onChange={(event) => setTitle(event.target.value)} />
       </div>
       <div className="grid grid--2col mb-lg">
         <div className="form-group">
-          <label className="form-label">HASH DEL CLIENTE</label>
-          <input className="form-input" value={clientHash} onChange={(event) => setClientHash(event.target.value)} />
+          <label className="form-label" htmlFor="ma-hash">HASH DEL CLIENTE</label>
+          <input className="form-input" id="ma-hash" value={clientHash} onChange={(event) => setClientHash(event.target.value)} />
         </div>
         <div className="form-group">
-          <label className="form-label">MONTO REFERENCIAL</label>
-          <input className="form-input" type="number" value={amount} onChange={(event) => setAmount(Number(event.target.value))} />
+          <label className="form-label" htmlFor="ma-amount">MONTO REFERENCIAL</label>
+          <input className="form-input" id="ma-amount" type="number" value={amount} onChange={(event) => setAmount(Number(event.target.value))} />
         </div>
       </div>
       <div className="form-group">
-        <label className="form-label">DETALLE INTERNO</label>
-        <textarea className="form-input form-textarea" value={description} onChange={(event) => setDescription(event.target.value)} />
+        <label className="form-label" htmlFor="ma-desc">DETALLE INTERNO</label>
+        <textarea className="form-input form-textarea" id="ma-desc" value={description} onChange={(event) => setDescription(event.target.value)} />
       </div>
     </ModalShell>
   );
