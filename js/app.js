@@ -241,7 +241,7 @@ function buyinBack() {
 function formatCurrency(input) {
     let value = input.value.replace(/[^\d]/g, '');
     if (value) {
-        value = parseInt(value).toLocaleString('es-ES');
+        value = Number.parseInt(value).toLocaleString('es-ES');
         input.value = '$ ' + value;
     }
 }
@@ -249,7 +249,7 @@ function formatCurrency(input) {
 function parseCurrency(value) {
     if (!value) return 0;
     const cleaned = value.replace(/[$.]/g, '').replace(/\s/g, '');
-    return parseInt(cleaned) || 0;
+    return Number.parseInt(cleaned) || 0;
 }
 
 function formatCurrencyDisplay(value) {
@@ -276,6 +276,12 @@ function addTransaction(tx) {
     renderTransactions();
 }
 
+function statusLabel(status) {
+    if (status === 'green') return 'verde';
+    if (status === 'yellow') return 'alerta';
+    return 'bloqueado';
+}
+
 function renderTransactions() {
     const tbody = document.getElementById('transactionsTable');
     if (!tbody) return;
@@ -290,9 +296,7 @@ function renderTransactions() {
             </td>
             <td class="table__monto">${tx.monto}</td>
             <td>
-                <span class="badge badge--${tx.status}">
-                    ${tx.status === 'green' ? 'verde' : tx.status === 'yellow' ? 'alerta' : 'bloqueado'}
-                </span>
+                <span class="badge badge--${tx.status}">${statusLabel(tx.status)}</span>
             </td>
         </tr>
     `).join('');
@@ -340,7 +344,7 @@ document.addEventListener('keydown', (e) => {
 
 // ==================== Print Functionality ====================
 function printReceipt() {
-    window.print();
+    globalThis.print();
 }
 
 // Initialize
