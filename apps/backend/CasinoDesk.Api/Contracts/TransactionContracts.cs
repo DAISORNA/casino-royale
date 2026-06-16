@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using CasinoDesk.Api.Domain;
 
 namespace CasinoDesk.Api.Contracts;
