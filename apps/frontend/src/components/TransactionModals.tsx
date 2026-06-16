@@ -25,7 +25,7 @@ function ModalShell({
   if (!isOpen) return null;
 
   return (
-    <dialog className="modal-overlay active" onClick={(event) => { if (event.target === event.currentTarget) onClose(); }}>
+    <div className="modal-overlay active">
       <div className="modal" style={{ maxWidth }}>
         <div className="modal__header">
           <h2 className="modal__title text-gold">{title}</h2>
@@ -36,7 +36,7 @@ function ModalShell({
         <div className="modal__body">{children}</div>
         {footer ? <div className="modal__footer">{footer}</div> : null}
       </div>
-    </dialog>
+    </div>
   );
 }
 
